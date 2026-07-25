@@ -12,11 +12,15 @@ function saveData() {
     DiskApi.saveFile(FILENAME, false, false);
 }
 
+function padTwo(n) {
+    return n < 10 ? "0" + n : "" + n;
+}
+
 function formatTanggalHariIni() {
     var now = new Date();
     var tahun = now.getFullYear();
-    var bulan = String(now.getMonth() + 1).padStart(2, "0");
-    var tanggal = String(now.getDate()).padStart(2, "0");
+    var bulan = padTwo(now.getMonth() + 1);
+    var tanggal = padTwo(now.getDate());
     return tahun + "-" + bulan + "-" + tanggal;
 }
 
