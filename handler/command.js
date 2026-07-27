@@ -1,5 +1,6 @@
 //!loadmanually
 const Bukkit = importClass("org.bukkit.Bukkit");
+const LuckPermsProvider = importClass("net.luckperms.api.LuckPermsProvider");
 const kelasManager = requireScript("../libs/libkelas.js");
 const luck = requireScript("../libs/libluckperms.js");
 const Tugas = requireScript("../libs/libtugas.js");
@@ -10,6 +11,7 @@ const ReportSys = requireScript("../libs/libreportcard.js");
 const OrgSys = requireScript("../libs/liborganisasi.js");
 const ExskulSys = requireScript("../libs/libextracurricular.js");
 const KoperasiSys = requireScript("../libs/libcooperative.js");
+const GroupSys = requireScript("../libs/libgroup.js");
 
 // --- EVENT LISTENER (Cegah Siswa/Guru Mengambil Item dari Virtual Chest) ---
 registerEvent("org.bukkit.event.inventory.InventoryClickEvent", function(event) {
@@ -30,31 +32,176 @@ addCommand("kelas", {
     try {
         const jsArgs = toArray(args);
         const aksi = jsArgs[0];
-        const restArgs = jsArgs.slice(1);
 
-        switch (aksi) {
-        case "tambah":
-            if (!restArgs[0]) {
+        if (aksi === "tambah") {
+            if (!sender.hasPermission("under.manage")) {
+                sender.sendMessage("§cKamu tidak punya izin untuk mengelola kelas.");
+                return;
+            }
+            if (!jsArgs[1]) {
                 sender.sendMessage("§cGunakan: /kelas tambah <nama_kelas> [weight]");
                 return;
             }
-            kelasManager.addGroup(restArgs[0], restArgs[1] ? parseInt(restArgs[1]) : 0);
-            sender.sendMessage("§aKelas " + restArgs[0] + " berhasil dibuat di LuckPerms.");
-            break;
-        case "hapus":
-            if (!restArgs[0]) {
+            kelasManager.addGroup(jsArgs[1], jsArgs[2] ? parseInt(jsArgs[2]) : 0);
+            sender.sendMessage("§aKelas " + jsArgs[1] + " berhasil dibuat di LuckPerms.");
+            return;
+        }
+
+        if (aksi === "hapus") {
+            if (!sender.hasPermission("under.manage")) {
+                sender.sendMessage("§cKamu tidak punya izin untuk mengelola kelas.");
+                return;
+            }
+            if (!jsArgs[1]) {
                 sender.sendMessage("§cGunakan: /kelas hapus <nama_kelas>");
                 return;
             }
-            kelasManager.removeGroup(restArgs[0], sender);
-            break;
-        default:
-            sender.sendMessage("§cGunakan: /kelas tambah|hapus");
+            kelasManager.removeGroup(jsArgs[1], sender);
+            return;
         }
+
+        if (aksi === "list") {
+            var kelasList = ["kelasa", "kelasb", "kelasc", "kelasd"];
+            var lp = LuckPermsProvider.get();
+            sender.sendMessage("§6=== Daftar Kelas ===");
+            for (var i = 0; i < kelasList.length; i++) {
+                var group = lp.getGroupManager().getGroup(kelasList[i]);
+                if (group) {
+                    sender.sendMessage("§7- §f" + kelasList[i].toUpperCase() + " §7(Weight: §e" + (group.getWeight() || 0) + "§7)");
+                } else {
+                    sender.sendMessage("§7- §f" + kelasList[i].toUpperCase() + " §c(tidak ada)");
+                }
+            }
+            return;
+        }
+
+        if (aksi === "info") {
+            if (!jsArgs[1]) {
+                sender.sendMessage("§cGunakan: /kelas info <nama_kelas>");
+                return;
+            }
+            var lp = LuckPermsProvider.get();
+            var group = lp.getGroupManager().getGroup(jsArgs[1]);
+            if (!group) {
+                sender.sendMessage("§cKelas '" + jsArgs[1] + "' tidak ditemukan.");
+                return;
+            }
+            sender.sendMessage("§6=== Info Kelas " + group.getName().toUpperCase() + " ===");
+            sender.sendMessage("§fWeight: §e" + (group.getWeight() || 0));
+
+            var nodes = group.getNodes();
+            var prefixes = [];
+            var iterator = nodes.iterator();
+            while (iterator.hasNext()) {
+                var node = iterator.next();
+                var key = node.getKey();
+                if (key.indexOf("prefix.") === 0) {
+                    prefixes.push(key.substring(7));
+                }
+            }
+            if (prefixes.length > 0) {
+                sender.sendMessage("§fPrefix: §e" + prefixes.join(", "));
+            }
+            return;
+        }
+
+        if (aksi === "siswa") {
+            if (!sender.hasPermission("under.manage")) {
+                sender.sendMessage("§cKamu tidak punya izin untuk melihat daftar siswa.");
+                return;
+            }
+            if (!jsArgs[1]) {
+                sender.sendMessage("§cGunakan: /kelas siswa <nama_kelas>");
+                return;
+            }
+            var members = GroupSys.getGroupMembers(jsArgs[1]);
+            if (members.length === 0) {
+                sender.sendMessage("§eTidak ada siswa di kelas " + jsArgs[1] + ".");
+                return;
+            }
+            sender.sendMessage("§6=== Siswa " + jsArgs[1].toUpperCase() + " (" + members.length + ") ===");
+            for (var i = 0; i < members.length; i++) {
+                sender.sendMessage("§7- §f" + members[i].name);
+            }
+            return;
+        }
+
+        if (aksi === "masukkan") {
+            if (!sender.hasPermission("under.manage")) {
+                sender.sendMessage("§cKamu tidak punya izin untuk mengelola siswa.");
+                return;
+            }
+            if (jsArgs.length < 3) {
+                sender.sendMessage("§cGunakan: /kelas masukkan <player> <nama_kelas>");
+                return;
+            }
+            var playerName = jsArgs[1];
+            var groupName = jsArgs[2];
+            var hasil = GroupSys.assignPlayer(playerName, groupName);
+            sender.sendMessage(hasil.sukses ? "§a" + hasil.pesan : "§c" + hasil.pesan);
+            return;
+        }
+
+        if (aksi === "keluarkan") {
+            if (!sender.hasPermission("under.manage")) {
+                sender.sendMessage("§cKamu tidak punya izin untuk mengelola siswa.");
+                return;
+            }
+            if (jsArgs.length < 3) {
+                sender.sendMessage("§cGunakan: /kelas keluarkan <player> <nama_kelas>");
+                return;
+            }
+            var playerName = jsArgs[1];
+            var groupName = jsArgs[2];
+            var hasil = GroupSys.removePlayer(playerName, groupName);
+            sender.sendMessage(hasil.sukses ? "§a" + hasil.pesan : "§c" + hasil.pesan);
+            return;
+        }
+
+        if (aksi === "setweight") {
+            if (!sender.hasPermission("under.manage")) {
+                sender.sendMessage("§cKamu tidak punya izin untuk mengatur weight.");
+                return;
+            }
+            if (jsArgs.length < 3) {
+                sender.sendMessage("§cGunakan: /kelas setweight <nama_kelas> <weight>");
+                return;
+            }
+            var hasil = GroupSys.setGroupWeight(jsArgs[1], parseInt(jsArgs[2]));
+            sender.sendMessage(hasil.sukses ? "§a" + hasil.pesan : "§c" + hasil.pesan);
+            return;
+        }
+
+        sender.sendMessage("§cGunakan: /kelas tambah|hapus|list|info|siswa|masukkan|keluarkan|setweight");
     } catch (e) {
         sender.sendMessage("§cTerjadi kesalahan saat memproses command kelas.");
         log.error("Command /kelas error: " + e);
     }
+  },
+  onTabComplete: function(sender, args) {
+    var jsArgs = toArray(args);
+    if (jsArgs.length === 1) {
+        return toJavaList(["tambah", "hapus", "list", "info", "siswa", "masukkan", "keluarkan", "setweight"]);
+    }
+    if (jsArgs.length === 2 && (jsArgs[0] === "masukkan" || jsArgs[0] === "keluarkan")) {
+        var names = [];
+        var players = Bukkit.getOnlinePlayers().toArray();
+        for (var i = 0; i < players.length; i++) names.push(players[i].getName());
+        return toJavaList(names);
+    }
+    if (jsArgs.length === 3 && (jsArgs[0] === "masukkan" || jsArgs[0] === "keluarkan")) {
+        return toJavaList(["kelasa", "kelasb", "kelasc", "kelasd"]);
+    }
+    if (jsArgs.length === 2 && (jsArgs[0] === "info" || jsArgs[0] === "siswa" || jsArgs[0] === "hapus")) {
+        return toJavaList(["kelasa", "kelasb", "kelasc", "kelasd"]);
+    }
+    if (jsArgs.length === 2 && jsArgs[0] === "tambah") {
+        return toJavaList(["kelasa", "kelasb", "kelasc", "kelasd"]);
+    }
+    if (jsArgs.length === 3 && jsArgs[0] === "setweight") {
+        return toJavaList(["kelasa", "kelasb", "kelasc", "kelasd"]);
+    }
+    return toJavaList([]);
   }
 }, "under.manage");
 
@@ -266,8 +413,19 @@ addCommand("report", {
             if (player) {
                 uuid = player.getUniqueId().toString();
             } else {
-                var offlinePlayer = Bukkit.getOfflinePlayer(playerName);
-                uuid = offlinePlayer.getUniqueId().toString();
+                var offlinePlayers = Bukkit.getOfflinePlayers();
+                var found = false;
+                for (var j = 0; j < offlinePlayers.length; j++) {
+                    if (offlinePlayers[j].getName() != null && offlinePlayers[j].getName().equalsIgnoreCase(playerName)) {
+                        uuid = offlinePlayers[j].getUniqueId().toString();
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    sender.sendMessage("§cPlayer '" + playerName + "' tidak ditemukan.");
+                    return;
+                }
             }
             
             const hasil = ReportSys.setGrade(uuid, playerName, subject, grade);
@@ -291,8 +449,19 @@ addCommand("report", {
             if (player) {
                 uuid = player.getUniqueId().toString();
             } else {
-                var offlinePlayer = Bukkit.getOfflinePlayer(playerName);
-                uuid = offlinePlayer.getUniqueId().toString();
+                var offlinePlayers = Bukkit.getOfflinePlayers();
+                var found = false;
+                for (var j = 0; j < offlinePlayers.length; j++) {
+                    if (offlinePlayers[j].getName() != null && offlinePlayers[j].getName().equalsIgnoreCase(playerName)) {
+                        uuid = offlinePlayers[j].getUniqueId().toString();
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    sender.sendMessage("§cPlayer '" + playerName + "' tidak ditemukan.");
+                    return;
+                }
             }
 
             // Memanggil fungsi getReport dari libreportcard.js
@@ -382,12 +551,19 @@ addCommand("organisasi", {
             if (target) {
                 uuid = target.getUniqueId().toString();
             } else {
-                var offline = Bukkit.getOfflinePlayer(playerName);
-                if (!offline.hasPlayedBefore()) {
+                var offlinePlayers = Bukkit.getOfflinePlayers();
+                var found = false;
+                for (var j = 0; j < offlinePlayers.length; j++) {
+                    if (offlinePlayers[j].getName() != null && offlinePlayers[j].getName().equalsIgnoreCase(playerName)) {
+                        uuid = offlinePlayers[j].getUniqueId().toString();
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
                     sender.sendMessage("§cPlayer '" + playerName + "' tidak ditemukan.");
                     return;
                 }
-                uuid = offline.getUniqueId().toString();
             }
             var hasil = OrgSys.addMember(orgName, playerName, uuid, role);
             sender.sendMessage(hasil.sukses ? "§a" + hasil.pesan : "§c" + hasil.pesan);
@@ -423,8 +599,19 @@ addCommand("organisasi", {
             if (target) {
                 uuid = target.getUniqueId().toString();
             } else {
-                var offline = Bukkit.getOfflinePlayer(playerName);
-                uuid = offline.getUniqueId().toString();
+                var offlinePlayers = Bukkit.getOfflinePlayers();
+                var found = false;
+                for (var j = 0; j < offlinePlayers.length; j++) {
+                    if (offlinePlayers[j].getName() != null && offlinePlayers[j].getName().equalsIgnoreCase(playerName)) {
+                        uuid = offlinePlayers[j].getUniqueId().toString();
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    sender.sendMessage("§cPlayer '" + playerName + "' tidak ditemukan.");
+                    return;
+                }
             }
             var hasil = OrgSys.setRole(jsArgs[1], playerName, uuid, jsArgs[4] || "Anggota");
             sender.sendMessage(hasil.sukses ? "§a" + hasil.pesan : "§c" + hasil.pesan);
@@ -662,12 +849,19 @@ addCommand("koperasi", {
             if (target) {
                 uuid = target.getUniqueId().toString();
             } else {
-                var offline = Bukkit.getOfflinePlayer(playerName);
-                if (!offline.hasPlayedBefore()) {
+                var offlinePlayers = Bukkit.getOfflinePlayers();
+                var found = false;
+                for (var j = 0; j < offlinePlayers.length; j++) {
+                    if (offlinePlayers[j].getName() != null && offlinePlayers[j].getName().equalsIgnoreCase(playerName)) {
+                        uuid = offlinePlayers[j].getUniqueId().toString();
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
                     sender.sendMessage("§cPlayer '" + playerName + "' tidak ditemukan.");
                     return;
                 }
-                uuid = offline.getUniqueId().toString();
             }
             var hasil = KoperasiSys.deposit(uuid, playerName, amount);
             sender.sendMessage(hasil.sukses ? "§a" + hasil.pesan : "§c" + hasil.pesan);
@@ -738,7 +932,7 @@ addCommand("koperasi", {
             return;
         }
 
-        if (aksi === "hapushmenu") {
+        if (aksi === "hapusmenu") {
             if (!sender.hasPermission("server.koperasi.manage")) {
                 sender.sendMessage("§cKamu tidak punya izin untuk mengelola menu.");
                 return;
@@ -789,4 +983,172 @@ addCommand("koperasi", {
         return toJavaList([]);
     }
 }, "server.koperasi.use");
+
+// --- COMMAND: /group ---
+addCommand("group", {
+    onCommand: function(sender, args) {
+        var jsArgs = toArray(args);
+        var aksi = jsArgs[0];
+
+        if (aksi === "create") {
+            if (!sender.hasPermission("server.group.manage")) {
+                sender.sendMessage("§cKamu tidak punya izin untuk membuat group.");
+                return;
+            }
+            if (jsArgs.length < 2) {
+                sender.sendMessage("§cGunakan: /group create <nama_group> [weight]");
+                return;
+            }
+            var hasil = GroupSys.createGroup(jsArgs[1], jsArgs[2] ? parseInt(jsArgs[2]) : null);
+            sender.sendMessage(hasil.sukses ? "§a" + hasil.pesan : "§c" + hasil.pesan);
+            return;
+        }
+
+        if (aksi === "delete") {
+            if (!sender.hasPermission("server.group.manage")) {
+                sender.sendMessage("§cKamu tidak punya izin untuk menghapus group.");
+                return;
+            }
+            if (jsArgs.length < 2) {
+                sender.sendMessage("§cGunakan: /group delete <nama_group>");
+                return;
+            }
+            var hasil = GroupSys.deleteGroup(jsArgs[1]);
+            sender.sendMessage(hasil.sukses ? "§a" + hasil.pesan : "§c" + hasil.pesan);
+            return;
+        }
+
+        if (aksi === "info") {
+            if (jsArgs.length < 2) {
+                sender.sendMessage("§cGunakan: /group info <nama_group>");
+                return;
+            }
+            var info = GroupSys.getGroupInfo(jsArgs[1]);
+            if (!info) {
+                sender.sendMessage("§cGroup '" + jsArgs[1] + "' tidak ditemukan.");
+                return;
+            }
+            sender.sendMessage("§6=== Info Group " + info.name.toUpperCase() + " ===");
+            sender.sendMessage("§fWeight: §e" + info.weight);
+            if (info.prefix) sender.sendMessage("§fPrefix: §e" + info.prefix);
+            if (info.permissions.length > 0) {
+                sender.sendMessage("§fMeta:");
+                for (var i = 0; i < info.permissions.length; i++) {
+                    sender.sendMessage(" §7- §f" + info.permissions[i]);
+                }
+            }
+            return;
+        }
+
+        if (aksi === "list") {
+            var groups = GroupSys.listGroups();
+            if (groups.length === 0) {
+                sender.sendMessage("§eTidak ada group.");
+                return;
+            }
+            sender.sendMessage("§6=== Daftar Group (" + groups.length + ") ===");
+            for (var i = 0; i < groups.length; i++) {
+                sender.sendMessage("§7- §f" + groups[i].name + " §7(Weight: §e" + groups[i].weight + "§7)");
+            }
+            return;
+        }
+
+        if (aksi === "setweight") {
+            if (!sender.hasPermission("server.group.manage")) {
+                sender.sendMessage("§cKamu tidak punya izin untuk mengatur weight.");
+                return;
+            }
+            if (jsArgs.length < 3) {
+                sender.sendMessage("§cGunakan: /group setweight <nama_group> <weight>");
+                return;
+            }
+            var hasil = GroupSys.setGroupWeight(jsArgs[1], parseInt(jsArgs[2]));
+            sender.sendMessage(hasil.sukses ? "§a" + hasil.pesan : "§c" + hasil.pesan);
+            return;
+        }
+
+        if (aksi === "assign") {
+            if (!sender.hasPermission("server.group.manage")) {
+                sender.sendMessage("§cKamu tidak punya izin untuk assign player.");
+                return;
+            }
+            if (jsArgs.length < 3) {
+                sender.sendMessage("§cGunakan: /group assign <player> <nama_group>");
+                return;
+            }
+            var hasil = GroupSys.assignPlayer(jsArgs[1], jsArgs[2]);
+            sender.sendMessage(hasil.sukses ? "§a" + hasil.pesan : "§c" + hasil.pesan);
+            return;
+        }
+
+        if (aksi === "remove") {
+            if (!sender.hasPermission("server.group.manage")) {
+                sender.sendMessage("§cKamu tidak punya izin untuk remove player.");
+                return;
+            }
+            if (jsArgs.length < 3) {
+                sender.sendMessage("§cGunakan: /group remove <player> <nama_group>");
+                return;
+            }
+            var hasil = GroupSys.removePlayer(jsArgs[1], jsArgs[2]);
+            sender.sendMessage(hasil.sukses ? "§a" + hasil.pesan : "§c" + hasil.pesan);
+            return;
+        }
+
+        if (aksi === "members") {
+            if (jsArgs.length < 2) {
+                sender.sendMessage("§cGunakan: /group members <nama_group>");
+                return;
+            }
+            var members = GroupSys.getGroupMembers(jsArgs[1]);
+            if (members.length === 0) {
+                sender.sendMessage("§eTidak ada anggota di group " + jsArgs[1] + ".");
+                return;
+            }
+            sender.sendMessage("§6=== Anggota " + jsArgs[1].toUpperCase() + " (" + members.length + ") ===");
+            for (var i = 0; i < members.length; i++) {
+                sender.sendMessage("§7- §f" + members[i].name);
+            }
+            return;
+        }
+
+        if (aksi === "player") {
+            if (jsArgs.length < 2) {
+                sender.sendMessage("§cGunakan: /group player <nama_player>");
+                return;
+            }
+            var groups = GroupSys.getPlayerGroups(jsArgs[1]);
+            if (groups.length === 0) {
+                sender.sendMessage("§ePlayer " + jsArgs[1] + " tidak ada di group manapun.");
+                return;
+            }
+            sender.sendMessage("§6=== Group " + jsArgs[1] + " ===");
+            for (var i = 0; i < groups.length; i++) {
+                sender.sendMessage("§7- §f" + groups[i]);
+            }
+            return;
+        }
+
+        sender.sendMessage("§cGunakan: /group create|delete|info|list|setweight|assign|remove|members|player");
+    },
+    onTabComplete: function(sender, args) {
+        var jsArgs = toArray(args);
+        if (jsArgs.length === 1) {
+            return toJavaList(["create", "delete", "info", "list", "setweight", "assign", "remove", "members", "player"]);
+        }
+        if (jsArgs.length === 2 && (jsArgs[0] === "assign" || jsArgs[0] === "remove")) {
+            var names = [];
+            var players = Bukkit.getOnlinePlayers().toArray();
+            for (var i = 0; i < players.length; i++) names.push(players[i].getName());
+            return toJavaList(names);
+        }
+        if (jsArgs.length === 2 && (jsArgs[0] === "info" || jsArgs[0] === "delete" || jsArgs[0] === "setweight" || jsArgs[0] === "members" || jsArgs[0] === "assign" || jsArgs[0] === "remove")) {
+            var groups = GroupSys.listGroups();
+            var names = [];
+            for (var i = 0; i < groups.length; i++) names.push(groups[i].name);
+            return toJavaList(names);
+        }
+        return toJavaList([]);
+    }
+}, "server.group.manage");
 

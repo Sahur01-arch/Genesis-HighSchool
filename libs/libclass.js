@@ -33,9 +33,17 @@ function recordAttendance(uuid, status) {
     try {
         loadData();
         var tanggalHariIni = formatTanggalHariIni();
-        var attendance = DiskApi.getVar(FILENAME, uuid, [], false);
+        var raw = DiskApi.getVar(FILENAME, uuid, null, false);
+        var attendance = raw ? JSON.parse(raw) : [];
 
-        var sudahAbsenHariIni = attendance.some(function(a) { return a.date === tanggalHariIni; });
+        var sudahAbsenHariIni = false;
+        for (var i = 0; i < attendance.length; i++) {
+            if (attendance[i].date === tanggalHariIni) {
+                sudahAbsenHariIni = true;
+                break;
+            }
+        }
+
         if (sudahAbsenHariIni) {
             return { sukses: false, pesan: "Kamu sudah absen hari ini." };
         }
@@ -45,7 +53,7 @@ function recordAttendance(uuid, status) {
             status: status,
             timestamp: Date.now()
         });
-        DiskApi.setVar(FILENAME, uuid, attendance, false);
+        DiskApi.setVar(FILENAME, uuid, JSON.stringify(attendance), false);
         saveData();
 
         log.info("[libclass] Absensi dicatat untuk UUID: " + uuid + " tanggal " + tanggalHariIni);
@@ -59,25 +67,33 @@ function recordAttendance(uuid, status) {
 function getAttendance(uuid) {
     if (!uuid) return [];
     loadData();
-    return DiskApi.getVar(FILENAME, uuid, [], false);
+    var raw = DiskApi.getVar(FILENAME, uuid, null, false);
+    return raw ? JSON.parse(raw) : [];
 }
 
 function getAttendanceBulanIni(uuid) {
     var semua = getAttendance(uuid);
     var prefixBulanIni = formatTanggalHariIni().substring(0, 7);
-    return semua.filter(function(a) { return a.date.indexOf(prefixBulanIni) === 0; });
+    var result = [];
+    for (var i = 0; i < semua.length; i++) {
+        if (semua[i].date.indexOf(prefixBulanIni) === 0) {
+            result.push(semua[i]);
+        }
+    }
+    return result;
 }
 
 function hitungRekap(uuid) {
     var semua = getAttendance(uuid);
     var rekap = { hadir: 0, izin: 0, sakit: 0, alpha: 0, total: semua.length };
 
-    semua.forEach(function(a) {
-        var statusLower = a.status.toLowerCase();
-        if (rekap.hasOwnProperty(statusLower)) {
-            rekap[statusLower]++;
-        }
-    });
+    for (var i = 0; i < semua.length; i++) {
+        var statusLower = semua[i].status.toLowerCase();
+        if (statusLower === "hadir") rekap.hadir++;
+        else if (statusLower === "izin") rekap.izin++;
+        else if (statusLower === "sakit") rekap.sakit++;
+        else if (statusLower === "alpha") rekap.alpha++;
+    }
 
     return rekap;
 }

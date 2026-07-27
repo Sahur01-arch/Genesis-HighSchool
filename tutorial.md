@@ -1,94 +1,226 @@
-# Panduan Penggunaan Command OpenJS (Tutorial)
+# UnderCity-Core — Tutorial Pemasangan
 
-Dokumen ini berisi panduan penggunaan command yang tersedia di server Undercity-Core menggunakan plugin OpenJS.
+## Persyaratan
 
----
-
-## 1. Command Kelas (`/kelas`)
-Digunakan untuk manajemen grup kelas di server.
-
-*   **Tambah Kelas:**
-    *   Command: `/kelas tambah <nama_kelas> [weight]`
-    *   Fungsi: Membuat grup kelas baru di LuckPerms.
-    *   Contoh: `/kelas tambah KelasA 10`
-
-*   **Hapus Kelas:**
-    *   Command: `/kelas hapus <nama_kelas>`
-    *   Fungsi: Menghapus grup kelas yang ada.
-    *   Contoh: `/kelas hapus KelasA`
+| Komponen | Versi Minimum | Keterangan |
+|---|---|---|
+| Server Minecraft | Paper/Purpur 1.13 - 1.21.8 | Bukan Spigot vanilla, harus Paper/Folia |
+| OpenJS Plugin | 1.2.0+ | Plugin scripting JavaScript |
+| LuckPerms Plugin | 5.4+ | Manajemen permission & group |
+| Java | 8+ | JVM yang menjalankan server |
 
 ---
 
-## 2. Command LPGroup (`/lpgroup`)
-Digunakan untuk manajemen prefix grup (hanya untuk Staff/Dev).
+## Langkah 1: Pasang OpenJS
 
-*   **Set Prefix:**
-    *   Command: `/lpgroup setprefix <grup> <text>`
-    *   Fungsi: Menetapkan prefix untuk grup tertentu.
-    *   Contoh: `/lpgroup setprefix KelasA &a[KelasA]`
+1. Download JAR OpenJS dari https://openjs.wiki.gd/ atau sumber resmi lainnya
+2. Copy file JAR ke folder `plugins/` server kamu
+3. Restart server sekali untuk generate folder structure:
+   ```
+   plugins/OpenJS/
+   ├── scripts/
+   ├── Libs/
+   └── config.yml
+   ```
 
-*   **Hapus Prefix:**
-    *   Command: `/lpgroup removeprefix <grup>`
-    *   Fungsi: Menghapus prefix dari grup tertentu.
-    *   Contoh: `/lpgroup removeprefix KelasA`
+## Langkah 2: Copy UnderCity-Core
+
+1. Copy seluruh isi folder `scripts/` dari project ini ke `plugins/OpenJS/scripts/`:
+
+   Yang harusnya ada di `plugins/OpenJS/scripts/`:
+   ```
+   scripts/
+   ├── main.js
+   ├── libs/
+   │   ├── libluckperms.js
+   │   ├── libkelas.js
+   │   ├── libtugas.js
+   │   ├── libclass.js
+   │   ├── libeventschool.js
+   │   ├── libreportcard.js
+   │   ├── liborganisasi.js
+   │   ├── libextracurricular.js
+   │   ├── libcooperative.js
+   │   ├── libgroup.js
+   │   ├── libnpc.js
+   │   ├── libwritecode.js
+   │   └── config.js
+   └── handler/
+       └── command.js
+   ```
+
+2. Pastikan tidak ada file yang tertimpa tanpa sengaja. Kalau ada file lama yang namanya sama, backup dulu.
+
+## Langkah 3: Install LuckPerms
+
+1. Download LuckPerms dari https://luckperms.net/
+2. Copy ke folder `plugins/`
+3. Restart server
+4. Tunggu LuckPerms selesai inisialisasi (cek console: `[LuckPerms] Finished enabling`)
+
+## Langkah 4: Konfigurasi OpenJS
+
+Edit `plugins/OpenJS/config.yml`:
+
+```yaml
+PrintScriptActivations: true
+AutoReloadScriptsOnChange: false   # Matikan saat debugging
+UseOldClassImporter: false
+debugMode: false
+AllowFeatureFlags: true
+```
+
+**PENTING:** `AutoReloadScriptsOnChange: false` sangat disarankan saat pertama kali setup supaya tidak ada reload ganda.
+
+## Langkah 5: Restart Server
+
+Restart server kamu. Di console harusnya muncul:
+```
+[OpenJS] [main.js] [System] Initializing startup sequence...
+[OpenJS] [main.js] [System] Dependencies loaded.
+[OpenJS] [main.js] [System] Successfully loaded: libs/libluckperms.js
+[OpenJS] [main.js] [System] Successfully loaded: libs/libkelas.js
+...
+[OpenJS] [main.js] [System] All modules initialized successfully.
+```
+
+Kalau ada error `[System] Failed to load ...`, cek bagian Troubleshooting di bawah.
+
+## Langkah 6: Setup Kelas Pertama
+
+Masuk ke server, jalankan command:
+
+```
+/kelas tambah kelasa
+/kelas tambah kelasb
+/kelas tambah kelasc
+/kelas tambah kelasd
+```
+
+Untuk set prefix tiap kelas:
+```
+/lpgroup setprefix kelasa &a[Kelas A]
+/lpgroup setprefix kelasb &b[Kelas B]
+/lpgroup setprefix kelasc &e[Kelas C]
+/lpgroup setprefix kelasd &c[Kelas D]
+```
+
+## Langkah 7: Set Permission Guru/Staff
+
+Di LuckPerms, set permission untuk akun guru:
+
+```
+/lp user <nama_player> permission set server.tugas.guru true
+/lp user <nama_player> permission set server.attendance.guru true
+/lp user <nama_player> permission set server.org.manage true
+/lp user <nama_player> permission set server.ekskul.manage true
+/lp user <nama_player> permission set server.koperasi.manage true
+/lp user <nama_player> permission set server.event.manage true
+/lp user <nama_player> permission set server.grade.manage true
+/lp user <nama_player> permission set server.group.manage true
+/lp user <nama_player> permission set server.npc.manage true
+/lp user <nama_player> permission set server.writecode.manage true
+```
 
 ---
 
-## 3. Command Tugas (`/tugas`)
-Digunakan untuk pengumpulan dan pemeriksaan tugas.
+## Daftar Command
 
-*   **Kumpulkan Tugas (Siswa):**
-    *   Command: `/tugas`
-    *   Fungsi: Mengumpulkan buku di tangan ke chest tugas kelas siswa tersebut.
-    *   Syarat: Harus memegang buku yang sudah di-sign (Written Book).
+### Siswa
+| Command | Fungsi |
+|---|---|
+| `/kelas` | Lihat info kelas sendiri |
+| `/tugas` | Submit tugas (pegang Written Book) |
+| `/attendance mark` | Absen hadir hari ini |
+| `/attendance cek <player>` | Cek absensi siswa lain |
+| `/report view <player>` | Lihat rapor sendiri |
+| `/event` | Lihat daftar event |
+| `/organisasi saya` | Lihat organisasi yang diikuti |
+| `/ekskul daftar <nama>` | Daftar ekskul |
+| `/ekskul saya` | Lihat ekskul yang diikuti |
+| `/koperasi saldo` | Cek saldo |
+| `/koperasi beli <item>` | Beli item kantin |
+| `/koperasi menu` | Lihat menu kantin |
+| `/agent` | Interaksi dengan NPC |
+| `/writecode` | Tulis/baca catatan code |
 
-*   **Periksa Tugas (Guru/Staff):**
-    *   Command: `/tugas cek <kelas>`
-    *   Fungsi: Membuka GUI virtual chest berisi tugas kelas yang dikumpulkan.
-    *   Syarat: Memiliki permission `server.tugas.guru`.
-
----
-
-## 4. Command Absensi (`/attendance`)
-Digunakan untuk mencatat kehadiran.
-
-*   **Tandai Kehadiran:**
-    *   Command: `/attendance mark`
-    *   Fungsi: Mencatat absensi pemain saat ini sebagai "Present".
-
----
-
-## 5. Command Event (`/event`)
-Digunakan untuk manajemen acara sekolah.
-
-*   **Buat Event:**
-    *   Command: `/event create <nama> <tanggal>`
-    *   Fungsi: Menjadwalkan event baru.
-    *   Contoh: `/event create "Ujian Akhir" "20-07-2026"`
-
----
-
-## 6. Command Report (`/report`)
-Digunakan untuk manajemen nilai (hanya untuk Staff/Guru).
-
-*   **Set Nilai:**
-    *   Command: `/report set <nama_player> <mapel> <nilai> [nama_kelas]`
-    *   Fungsi: Mengatur nilai mata pelajaran siswa, memperbarui rata-rata, dan secara opsional menambahkan pemain ke grup kelas (kelasa-kelasd).
-    *   Contoh: `/report set Budi Matematika 90 kelasa`
+### Guru/Staff (butuh permission)
+| Command | Fungsi |
+|---|---|
+| `/kelas tambah\|hapus\|list\|info\|siswa` | Kelola kelas |
+| `/tugas cek <kelas>` | Buka chest tugas kelas |
+| `/attendance cek <player>` | Lihat rekap absensi |
+| `/report set\|view` | Set/view nilai rapor |
+| `/event create` | Buat event baru |
+| `/organisasi buat\|tambah\|jabatan` | Kelola organisasi |
+| `/ekskul buat\|hapus` | Kelola ekskul |
+| `/koperasi deposit\|tarik\|tambahmenu\|riwayat` | Kelola koperasi |
+| `/group create\|delete\|info\|listmembers` | Kelola group LuckPerms |
+| `/agent buat\|hapus\|dialog\|list` | Kelola NPC |
+| `/writecode write\|list\|hapus` | Kelola catatan code |
 
 ---
 
-## 7. Setup Permission (LuckPerms)
-Untuk mengatur hak akses command, gunakan perintah LuckPerms berikut di console server:
+## Struktur Data
 
-*   **Akses Dasar (Siswa):**
-    `lp group default permission set server.tugas.use true`
-    (Memberikan akses untuk menggunakan command `/tugas` bagi siswa).
+Semua data disimpan di folder `plugins/OpenJS/data/` via DiskApi:
 
-*   **Akses Guru/Staff:**
-    `lp group <nama_grup_staff> permission set server.tugas.guru true`
-    (Memberikan akses untuk menggunakan command `/tugas cek <kelas>` bagi guru).
+| File | Isi |
+|---|---|
+| `attendance_data` | Riwayat absensi per UUID |
+| `grade_data` | Nilai rapor per UUID |
+| `event_data` | Daftar event |
+| `organisasi_data` | Data organisasi & anggota |
+| `ekskul_data` | Data ekstrakurikuler & anggota |
+| `koperasi_balance` | Saldo koperasi per UUID |
+| `koperasi_menu` | Menu item kantin |
+| `koperasi_log` | Riwayat transaksi |
+| `npc_data` | Data NPC & dialog |
+| `writecode_data` | Catatan code in-game |
 
-*   **Akses Manajemen Kelas/Report (Admin/Guru):**
-    `lp group <nama_grup_admin> permission set under.manage true`
-    `lp group <nama_grup_admin> permission set server.grade.manage true`
+---
+
+## Troubleshooting
+
+### Script gagal load
+```
+[ERROR] [System] Failed to load libs/libkelas.js: ...
+```
+**Solusi:** Cek apakah LuckPerms sudah terinstall. Cek juga syntax error di file yang gagal load.
+
+### Error `getUniqueId is not a function`
+**Solusi:** Command dijalankan dari console tapi butuh Player. Jalankan dari in-game.
+
+### Error `padStart is not a function`
+**Solusi:** Nashorn engine tidak support ES6 `padStart`. Pastikan pakai versi lib terbaru yang sudah pakai `padTwo()`.
+
+### Data tidak tersimpan
+**Solusi:** Cek apakah folder `plugins/OpenJS/data/` ada dan writable. Jangan edit file data langsung saat server jalan.
+
+### Reload tidak berefek
+**Solusi:** Pakai `/oj disable <script>` lalu `/oj enable <script>`. Atau restart server.
+
+---
+
+## Permissions Lengkap
+
+| Permission | Fungsi |
+|---|---|
+| `under.manage` | Akses /kelas dan /lpgroup |
+| `server.tugas.use` | Akses /tugas (siswa) |
+| `server.tugas.guru` | Akses /tugas cek (guru) |
+| `server.attendance.use` | Akses /attendance mark |
+| `server.attendance.guru` | Akses /attendance cek |
+| `server.grade.manage` | Akses /report set |
+| `server.event.manage` | Akses /event create |
+| `server.org.use` | Akses /organisasi |
+| `server.org.manage` | Akses /organisasi buat/tambah/jabatan |
+| `server.ekskul.use` | Akses /ekskul |
+| `server.ekskul.manage` | Akses /ekskul buat/hapus |
+| `server.koperasi.use` | Akses /koperasi saldo/beli/tarik |
+| `server.koperasi.manage` | Akses /koperasi deposit/tambahmenu |
+| `server.group.manage` | Akses /group |
+| `server.npc.use` | Akses /agent (interaksi) |
+| `server.npc.manage` | Akses /agent buat/hapus/dialog |
+| `server.writecode.use` | Akses /writecode |
+| `server.writecode.manage` | Akses /writecode write/hapus |

@@ -17,7 +17,8 @@ function createExtracurricular(name, description, schedule) {
 
     try {
         loadData();
-        var ekskuls = DiskApi.getVar(FILENAME, "extracurriculars", {}, false);
+        var raw = DiskApi.getVar(FILENAME, "extracurriculars", null, false);
+        var ekskuls = raw ? JSON.parse(raw) : {};
 
         if (ekskuls[name.toLowerCase()]) {
             return { sukses: false, pesan: "Ekstrakurikuler '" + name + "' sudah ada." };
@@ -31,7 +32,7 @@ function createExtracurricular(name, description, schedule) {
             created: Date.now()
         };
 
-        DiskApi.setVar(FILENAME, "extracurriculars", ekskuls, false);
+        DiskApi.setVar(FILENAME, "extracurriculars", JSON.stringify(ekskuls), false);
         saveData();
         log.info("[libextracurricular] Ekskul '" + name + "' berhasil dibuat.");
         return { sukses: true, pesan: "Ekstrakurikuler '" + name + "' berhasil dibuat." };
@@ -46,13 +47,14 @@ function deleteExtracurricular(name) {
 
     try {
         loadData();
-        var ekskuls = DiskApi.getVar(FILENAME, "extracurriculars", {}, false);
+        var raw = DiskApi.getVar(FILENAME, "extracurriculars", null, false);
+        var ekskuls = raw ? JSON.parse(raw) : {};
         var key = name.toLowerCase();
 
         if (!ekskuls[key]) return { sukses: false, pesan: "Ekstrakurikuler '" + name + "' tidak ditemukan." };
 
         delete ekskuls[key];
-        DiskApi.setVar(FILENAME, "extracurriculars", ekskuls, false);
+        DiskApi.setVar(FILENAME, "extracurriculars", JSON.stringify(ekskuls), false);
         saveData();
         log.info("[libextracurricular] Ekskul '" + name + "' berhasil dihapus.");
         return { sukses: true, pesan: "Ekstrakurikuler '" + name + "' berhasil dihapus." };
@@ -69,7 +71,8 @@ function registerStudent(exskulName, playerName, uuid) {
 
     try {
         loadData();
-        var ekskuls = DiskApi.getVar(FILENAME, "extracurriculars", {}, false);
+        var raw = DiskApi.getVar(FILENAME, "extracurriculars", null, false);
+        var ekskuls = raw ? JSON.parse(raw) : {};
         var key = exskulName.toLowerCase();
 
         if (!ekskuls[key]) return { sukses: false, pesan: "Ekstrakurikuler '" + exskulName + "' tidak ditemukan." };
@@ -86,7 +89,7 @@ function registerStudent(exskulName, playerName, uuid) {
             joined: Date.now()
         });
 
-        DiskApi.setVar(FILENAME, "extracurriculars", ekskuls, false);
+        DiskApi.setVar(FILENAME, "extracurriculars", JSON.stringify(ekskuls), false);
         saveData();
         log.info("[libextracurricular] " + playerName + " mendaftar di " + exskulName);
         return { sukses: true, pesan: playerName + " berhasil mendaftar di " + exskulName + "." };
@@ -101,7 +104,8 @@ function unregisterStudent(exskulName, playerName, uuid) {
 
     try {
         loadData();
-        var ekskuls = DiskApi.getVar(FILENAME, "extracurriculars", {}, false);
+        var raw = DiskApi.getVar(FILENAME, "extracurriculars", null, false);
+        var ekskuls = raw ? JSON.parse(raw) : {};
         var key = exskulName.toLowerCase();
 
         if (!ekskuls[key]) return { sukses: false, pesan: "Ekstrakurikuler '" + exskulName + "' tidak ditemukan." };
@@ -117,7 +121,7 @@ function unregisterStudent(exskulName, playerName, uuid) {
 
         if (!found) return { sukses: false, pesan: (playerName || "Player") + " bukan anggota " + exskulName + "." };
 
-        DiskApi.setVar(FILENAME, "extracurriculars", ekskuls, false);
+        DiskApi.setVar(FILENAME, "extracurriculars", JSON.stringify(ekskuls), false);
         saveData();
         log.info("[libextracurricular] " + (playerName || "Player") + " keluar dari " + exskulName);
         return { sukses: true, pesan: (playerName || "Player") + " berhasil keluar dari " + exskulName + "." };
@@ -130,13 +134,16 @@ function unregisterStudent(exskulName, playerName, uuid) {
 function getExtracurricular(name) {
     if (!name) return null;
     loadData();
-    var ekskuls = DiskApi.getVar(FILENAME, "extracurriculars", {}, false);
+    var raw = DiskApi.getVar(FILENAME, "extracurriculars", null, false);
+    if (!raw) return null;
+    var ekskuls = JSON.parse(raw);
     return ekskuls[name.toLowerCase()] || null;
 }
 
 function listExtracurriculars() {
     loadData();
-    var ekskuls = DiskApi.getVar(FILENAME, "extracurriculars", {}, false);
+    var raw = DiskApi.getVar(FILENAME, "extracurriculars", null, false);
+    var ekskuls = raw ? JSON.parse(raw) : {};
     var result = [];
     for (var key in ekskuls) {
         result.push({
@@ -151,7 +158,8 @@ function listExtracurriculars() {
 
 function getExtracurricularsForMember(uuid) {
     loadData();
-    var ekskuls = DiskApi.getVar(FILENAME, "extracurriculars", {}, false);
+    var raw = DiskApi.getVar(FILENAME, "extracurriculars", null, false);
+    var ekskuls = raw ? JSON.parse(raw) : {};
     var result = [];
     for (var key in ekskuls) {
         for (var i = 0; i < ekskuls[key].members.length; i++) {

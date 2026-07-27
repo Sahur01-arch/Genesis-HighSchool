@@ -16,20 +16,20 @@ function saveAll() {
     DiskApi.saveFile(FILENAME_LOG, false, false);
 }
 
+function padTwo(n) {
+    return n < 10 ? "0" + n : "" + n;
+}
+
 function formatTanggal() {
     var now = new Date();
-    var d = now.getDate();
-    var m = now.getMonth() + 1;
-    var y = now.getFullYear();
-    var h = now.getHours();
-    var mi = now.getMinutes();
-    var s = now.getSeconds();
-    return y + "-" + (m < 10 ? "0" : "") + m + "-" + (d < 10 ? "0" : "") + d + " " + (h < 10 ? "0" : "") + h + ":" + (mi < 10 ? "0" : "") + mi + ":" + (s < 10 ? "0" : "") + s;
+    return now.getFullYear() + "-" + padTwo(now.getMonth() + 1) + "-" + padTwo(now.getDate()) + " " + padTwo(now.getHours()) + ":" + padTwo(now.getMinutes()) + ":" + padTwo(now.getSeconds());
 }
 
 function getBalance(uuid) {
     loadAll();
-    return DiskApi.getVar(FILENAME_BALANCE, uuid, 0, false);
+    var raw = DiskApi.getVar(FILENAME_BALANCE, uuid, null, false);
+    if (raw === null || raw === undefined) return 0;
+    return parseInt(raw) || 0;
 }
 
 function setBalance(uuid, amount) {
@@ -51,11 +51,12 @@ function deposit(uuid, playerName, amount) {
 
     try {
         loadAll();
-        var current = DiskApi.getVar(FILENAME_BALANCE, uuid, 0, false);
+        var current = getBalance(uuid);
         var newBalance = current + amount;
         DiskApi.setVar(FILENAME_BALANCE, uuid, newBalance, false);
 
-        var logs = DiskApi.getVar(FILENAME_LOG, "transactions", [], false);
+        var rawLogs = DiskApi.getVar(FILENAME_LOG, "transactions", null, false);
+        var logs = rawLogs ? JSON.parse(rawLogs) : [];
         logs.push({
             type: "DEPOSIT",
             player: playerName,
@@ -64,7 +65,7 @@ function deposit(uuid, playerName, amount) {
             balanceAfter: newBalance,
             date: formatTanggal()
         });
-        DiskApi.setVar(FILENAME_LOG, "transactions", logs, false);
+        DiskApi.setVar(FILENAME_LOG, "transactions", JSON.stringify(logs), false);
         saveAll();
 
         log.info("[libcooperative] " + playerName + " deposit " + amount + ". Saldo: " + newBalance);
@@ -82,7 +83,7 @@ function withdraw(uuid, playerName, amount) {
 
     try {
         loadAll();
-        var current = DiskApi.getVar(FILENAME_BALANCE, uuid, 0, false);
+        var current = getBalance(uuid);
 
         if (current < amount) {
             return { sukses: false, pesan: "Saldo tidak mencukupi. Saldo kamu: " + current };
@@ -91,7 +92,8 @@ function withdraw(uuid, playerName, amount) {
         var newBalance = current - amount;
         DiskApi.setVar(FILENAME_BALANCE, uuid, newBalance, false);
 
-        var logs = DiskApi.getVar(FILENAME_LOG, "transactions", [], false);
+        var rawLogs = DiskApi.getVar(FILENAME_LOG, "transactions", null, false);
+        var logs = rawLogs ? JSON.parse(rawLogs) : [];
         logs.push({
             type: "WITHDRAW",
             player: playerName,
@@ -100,7 +102,7 @@ function withdraw(uuid, playerName, amount) {
             balanceAfter: newBalance,
             date: formatTanggal()
         });
-        DiskApi.setVar(FILENAME_LOG, "transactions", logs, false);
+        DiskApi.setVar(FILENAME_LOG, "transactions", JSON.stringify(logs), false);
         saveAll();
 
         log.info("[libcooperative] " + playerName + " tarik " + amount + ". Saldo: " + newBalance);
@@ -116,13 +118,14 @@ function buyItem(uuid, playerName, itemName) {
 
     try {
         loadAll();
-        var menu = DiskApi.getVar(FILENAME_MENU, "items", {}, false);
+        var rawMenu = DiskApi.getVar(FILENAME_MENU, "items", null, false);
+        var menu = rawMenu ? JSON.parse(rawMenu) : {};
         var key = itemName.toLowerCase();
 
         if (!menu[key]) return { sukses: false, pesan: "Item '" + itemName + "' tidak tersedia di kantin." };
 
         var item = menu[key];
-        var current = DiskApi.getVar(FILENAME_BALANCE, uuid, 0, false);
+        var current = getBalance(uuid);
 
         if (current < item.price) {
             return { sukses: false, pesan: "Saldo tidak mencukupi. Harga: " + item.price + ", Saldo: " + current };
@@ -131,7 +134,8 @@ function buyItem(uuid, playerName, itemName) {
         var newBalance = current - item.price;
         DiskApi.setVar(FILENAME_BALANCE, uuid, newBalance, false);
 
-        var logs = DiskApi.getVar(FILENAME_LOG, "transactions", [], false);
+        var rawLogs = DiskApi.getVar(FILENAME_LOG, "transactions", null, false);
+        var logs = rawLogs ? JSON.parse(rawLogs) : [];
         logs.push({
             type: "BUY",
             player: playerName,
@@ -141,7 +145,7 @@ function buyItem(uuid, playerName, itemName) {
             balanceAfter: newBalance,
             date: formatTanggal()
         });
-        DiskApi.setVar(FILENAME_LOG, "transactions", logs, false);
+        DiskApi.setVar(FILENAME_LOG, "transactions", JSON.stringify(logs), false);
         saveAll();
 
         log.info("[libcooperative] " + playerName + " beli " + item.name + " (" + item.price + "). Saldo: " + newBalance);
@@ -157,7 +161,8 @@ function addItemMenu(name, description, price) {
 
     try {
         loadAll();
-        var menu = DiskApi.getVar(FILENAME_MENU, "items", {}, false);
+        var rawMenu = DiskApi.getVar(FILENAME_MENU, "items", null, false);
+        var menu = rawMenu ? JSON.parse(rawMenu) : {};
 
         if (menu[name.toLowerCase()]) {
             return { sukses: false, pesan: "Item '" + name + "' sudah ada di menu." };
@@ -169,7 +174,7 @@ function addItemMenu(name, description, price) {
             price: parseInt(price)
         };
 
-        DiskApi.setVar(FILENAME_MENU, "items", menu, false);
+        DiskApi.setVar(FILENAME_MENU, "items", JSON.stringify(menu), false);
         saveAll();
         log.info("[libcooperative] Item '" + name + "' ditambahkan ke menu.");
         return { sukses: true, pesan: "Item '" + name + "' berhasil ditambahkan ke menu kantin." };
@@ -184,13 +189,14 @@ function removeItemMenu(name) {
 
     try {
         loadAll();
-        var menu = DiskApi.getVar(FILENAME_MENU, "items", {}, false);
+        var rawMenu = DiskApi.getVar(FILENAME_MENU, "items", null, false);
+        var menu = rawMenu ? JSON.parse(rawMenu) : {};
         var key = name.toLowerCase();
 
         if (!menu[key]) return { sukses: false, pesan: "Item '" + name + "' tidak ditemukan di menu." };
 
         delete menu[key];
-        DiskApi.setVar(FILENAME_MENU, "items", menu, false);
+        DiskApi.setVar(FILENAME_MENU, "items", JSON.stringify(menu), false);
         saveAll();
         return { sukses: true, pesan: "Item '" + name + "' berhasil dihapus dari menu." };
     } catch (e) {
@@ -201,12 +207,14 @@ function removeItemMenu(name) {
 
 function getMenu() {
     loadAll();
-    return DiskApi.getVar(FILENAME_MENU, "items", {}, false);
+    var rawMenu = DiskApi.getVar(FILENAME_MENU, "items", null, false);
+    return rawMenu ? JSON.parse(rawMenu) : {};
 }
 
 function getTransactionLog(count) {
     loadAll();
-    var logs = DiskApi.getVar(FILENAME_LOG, "transactions", [], false);
+    var rawLogs = DiskApi.getVar(FILENAME_LOG, "transactions", null, false);
+    var logs = rawLogs ? JSON.parse(rawLogs) : [];
     var limit = count || 10;
     var start = Math.max(0, logs.length - limit);
     var result = [];

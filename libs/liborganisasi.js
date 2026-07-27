@@ -17,7 +17,8 @@ function createOrganisation(name, description) {
 
     try {
         loadData();
-        var orgs = DiskApi.getVar(FILENAME, "organisations", {}, false);
+        var raw = DiskApi.getVar(FILENAME, "organisations", null, false);
+        var orgs = raw ? JSON.parse(raw) : {};
 
         if (orgs[name.toLowerCase()]) {
             return { sukses: false, pesan: "Organisasi '" + name + "' sudah ada." };
@@ -30,7 +31,7 @@ function createOrganisation(name, description) {
             created: Date.now()
         };
 
-        DiskApi.setVar(FILENAME, "organisations", orgs, false);
+        DiskApi.setVar(FILENAME, "organisations", JSON.stringify(orgs), false);
         saveData();
         log.info("[liborganisasi] Organisasi '" + name + "' berhasil dibuat.");
         return { sukses: true, pesan: "Organisasi '" + name + "' berhasil dibuat." };
@@ -45,7 +46,8 @@ function deleteOrganisation(name) {
 
     try {
         loadData();
-        var orgs = DiskApi.getVar(FILENAME, "organisations", {}, false);
+        var raw = DiskApi.getVar(FILENAME, "organisations", null, false);
+        var orgs = raw ? JSON.parse(raw) : {};
         var key = name.toLowerCase();
 
         if (!orgs[key]) {
@@ -53,7 +55,7 @@ function deleteOrganisation(name) {
         }
 
         delete orgs[key];
-        DiskApi.setVar(FILENAME, "organisations", orgs, false);
+        DiskApi.setVar(FILENAME, "organisations", JSON.stringify(orgs), false);
         saveData();
         log.info("[liborganisasi] Organisasi '" + name + "' berhasil dihapus.");
         return { sukses: true, pesan: "Organisasi '" + name + "' berhasil dihapus." };
@@ -75,7 +77,8 @@ function addMember(orgName, playerName, uuid, role) {
 
     try {
         loadData();
-        var orgs = DiskApi.getVar(FILENAME, "organisations", {}, false);
+        var raw = DiskApi.getVar(FILENAME, "organisations", null, false);
+        var orgs = raw ? JSON.parse(raw) : {};
         var key = orgName.toLowerCase();
 
         if (!orgs[key]) {
@@ -92,7 +95,7 @@ function addMember(orgName, playerName, uuid, role) {
             joined: Date.now()
         };
 
-        DiskApi.setVar(FILENAME, "organisations", orgs, false);
+        DiskApi.setVar(FILENAME, "organisations", JSON.stringify(orgs), false);
         saveData();
         log.info("[liborganisasi] " + playerName + " ditambahkan ke " + orgName + " sebagai " + (role || "Anggota"));
         return { sukses: true, pesan: playerName + " berhasil ditambahkan ke " + orgName + " sebagai " + (role || "Anggota") + "." };
@@ -107,14 +110,15 @@ function removeMember(orgName, playerName, uuid) {
 
     try {
         loadData();
-        var orgs = DiskApi.getVar(FILENAME, "organisations", {}, false);
+        var raw = DiskApi.getVar(FILENAME, "organisations", null, false);
+        var orgs = raw ? JSON.parse(raw) : {};
         var key = orgName.toLowerCase();
 
         if (!orgs[key]) return { sukses: false, pesan: "Organisasi '" + orgName + "' tidak ditemukan." };
         if (!orgs[key].members[uuid]) return { sukses: false, pesan: (playerName || "Player") + " bukan anggota " + orgName + "." };
 
         delete orgs[key].members[uuid];
-        DiskApi.setVar(FILENAME, "organisations", orgs, false);
+        DiskApi.setVar(FILENAME, "organisations", JSON.stringify(orgs), false);
         saveData();
         log.info("[liborganisasi] " + (playerName || "Player") + " dihapus dari " + orgName);
         return { sukses: true, pesan: (playerName || "Player") + " berhasil dihapus dari " + orgName + "." };
@@ -134,14 +138,15 @@ function setRole(orgName, playerName, uuid, newRole) {
 
     try {
         loadData();
-        var orgs = DiskApi.getVar(FILENAME, "organisations", {}, false);
+        var raw = DiskApi.getVar(FILENAME, "organisations", null, false);
+        var orgs = raw ? JSON.parse(raw) : {};
         var key = orgName.toLowerCase();
 
         if (!orgs[key]) return { sukses: false, pesan: "Organisasi '" + orgName + "' tidak ditemukan." };
         if (!orgs[key].members[uuid]) return { sukses: false, pesan: playerName + " bukan anggota " + orgName + "." };
 
         orgs[key].members[uuid].role = newRole;
-        DiskApi.setVar(FILENAME, "organisations", orgs, false);
+        DiskApi.setVar(FILENAME, "organisations", JSON.stringify(orgs), false);
         saveData();
         return { sukses: true, pesan: "Jabatan " + playerName + " di " + orgName + " diubah menjadi " + newRole + "." };
     } catch (e) {
@@ -153,13 +158,16 @@ function setRole(orgName, playerName, uuid, newRole) {
 function getOrganisation(orgName) {
     if (!orgName) return null;
     loadData();
-    var orgs = DiskApi.getVar(FILENAME, "organisations", {}, false);
+    var raw = DiskApi.getVar(FILENAME, "organisations", null, false);
+    if (!raw) return null;
+    var orgs = JSON.parse(raw);
     return orgs[orgName.toLowerCase()] || null;
 }
 
 function listOrganisations() {
     loadData();
-    var orgs = DiskApi.getVar(FILENAME, "organisations", {}, false);
+    var raw = DiskApi.getVar(FILENAME, "organisations", null, false);
+    var orgs = raw ? JSON.parse(raw) : {};
     var result = [];
     for (var key in orgs) {
         var memberCount = 0;
@@ -177,7 +185,8 @@ function getMemberInfo(orgName, uuid) {
 
 function getOrganisationsForMember(uuid) {
     loadData();
-    var orgs = DiskApi.getVar(FILENAME, "organisations", {}, false);
+    var raw = DiskApi.getVar(FILENAME, "organisations", null, false);
+    var orgs = raw ? JSON.parse(raw) : {};
     var result = [];
     for (var key in orgs) {
         if (orgs[key].members[uuid]) {

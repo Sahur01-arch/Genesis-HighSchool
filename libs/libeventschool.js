@@ -14,12 +14,13 @@ function createEvent(name, date) {
         log.error("[libeventschool] Gagal buat event: Nama atau tanggal tidak valid.");
         return { sukses: false, pesan: "Data event tidak lengkap." };
     }
-    
+
     try {
         loadData();
-        const events = DiskApi.getVar(FILENAME, "events", [], false);
-        events.push({name: name, date: date});
-        DiskApi.setVar(FILENAME, "events", events, false);
+        var raw = DiskApi.getVar(FILENAME, "events", null, false);
+        var events = raw ? JSON.parse(raw) : [];
+        events.push({ name: name, date: date });
+        DiskApi.setVar(FILENAME, "events", JSON.stringify(events), false);
         saveData();
         log.info("[libeventschool] Event '" + name + "' berhasil dibuat.");
         return { sukses: true, pesan: "Event '" + name + "' berhasil dijadwalkan pada " + date + "." };
@@ -31,7 +32,8 @@ function createEvent(name, date) {
 
 function getEvents() {
     loadData();
-    return DiskApi.getVar(FILENAME, "events", [], false);
+    var raw = DiskApi.getVar(FILENAME, "events", null, false);
+    return raw ? JSON.parse(raw) : [];
 }
 
 return {

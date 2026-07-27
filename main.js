@@ -21,6 +21,7 @@ task.thread(function() {
         "libs/liborganisasi.js",
         "libs/libextracurricular.js",
         "libs/libcooperative.js",
+        "libs/libgroup.js",
         "handler/command.js"
     ];
 
@@ -63,6 +64,7 @@ task.bindToUnload(function() {
     log.info("[System] Unloading modules...");
     // Unload in reverse order
     UnloadScript("handler/command.js");
+    UnloadScript("libs/libgroup.js");
     UnloadScript("libs/libcooperative.js");
     UnloadScript("libs/libextracurricular.js");
     UnloadScript("libs/liborganisasi.js");
