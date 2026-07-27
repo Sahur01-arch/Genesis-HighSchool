@@ -42,8 +42,6 @@
    │   ├── libextracurricular.js
    │   ├── libcooperative.js
    │   ├── libgroup.js
-   │   ├── libnpc.js
-   │   ├── libwritecode.js
    │   └── config.js
    └── handler/
        └── command.js
@@ -141,8 +139,6 @@ Di LuckPerms, set permission untuk akun guru:
 | `/koperasi saldo` | Cek saldo |
 | `/koperasi beli <item>` | Beli item kantin |
 | `/koperasi menu` | Lihat menu kantin |
-| `/agent` | Interaksi dengan NPC |
-| `/writecode` | Tulis/baca catatan code |
 
 ### Guru/Staff (butuh permission)
 | Command | Fungsi |
@@ -155,9 +151,7 @@ Di LuckPerms, set permission untuk akun guru:
 | `/organisasi buat\|tambah\|jabatan` | Kelola organisasi |
 | `/ekskul buat\|hapus` | Kelola ekskul |
 | `/koperasi deposit\|tarik\|tambahmenu\|riwayat` | Kelola koperasi |
-| `/group create\|delete\|info\|listmembers` | Kelola group LuckPerms |
-| `/agent buat\|hapus\|dialog\|list` | Kelola NPC |
-| `/writecode write\|list\|hapus` | Kelola catatan code |
+| `/group create\|delete\|info\|listmembers` | Kelola group
 
 ---
 
@@ -175,8 +169,6 @@ Semua data disimpan di folder `plugins/OpenJS/data/` via DiskApi:
 | `koperasi_balance` | Saldo koperasi per UUID |
 | `koperasi_menu` | Menu item kantin |
 | `koperasi_log` | Riwayat transaksi |
-| `npc_data` | Data NPC & dialog |
-| `writecode_data` | Catatan code in-game |
 
 ---
 
@@ -219,8 +211,4 @@ Semua data disimpan di folder `plugins/OpenJS/data/` via DiskApi:
 | `server.ekskul.manage` | Akses /ekskul buat/hapus |
 | `server.koperasi.use` | Akses /koperasi saldo/beli/tarik |
 | `server.koperasi.manage` | Akses /koperasi deposit/tambahmenu |
-| `server.group.manage` | Akses /group |
-| `server.npc.use` | Akses /agent (interaksi) |
-| `server.npc.manage` | Akses /agent buat/hapus/dialog |
-| `server.writecode.use` | Akses /writecode |
-| `server.writecode.manage` | Akses /writecode write/hapus |
+| `server.group.manage` | Akses /group ||
