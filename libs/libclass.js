@@ -16,6 +16,18 @@ function padTwo(n) {
     return n < 10 ? "0" + n : "" + n;
 }
 
+function safeParse(raw, fallback) {
+    if (raw === null || raw === undefined) return fallback;
+    var str = String(raw);
+    if (!str) return fallback;
+    try {
+        return JSON.parse(str);
+    } catch (e) {
+        log.error("[libclass] JSON parse error, resetting data: " + e);
+        return fallback;
+    }
+}
+
 function formatTanggalHariIni() {
     var now = new Date();
     var tahun = now.getFullYear();
@@ -33,8 +45,7 @@ function recordAttendance(uuid, status) {
     try {
         loadData();
         var tanggalHariIni = formatTanggalHariIni();
-        var raw = DiskApi.getVar(FILENAME, uuid, null, false);
-        var attendance = raw ? JSON.parse(raw) : [];
+        var attendance = safeParse(DiskApi.getVar(FILENAME, uuid, null, false), []);
 
         var sudahAbsenHariIni = false;
         for (var i = 0; i < attendance.length; i++) {
@@ -67,8 +78,7 @@ function recordAttendance(uuid, status) {
 function getAttendance(uuid) {
     if (!uuid) return [];
     loadData();
-    var raw = DiskApi.getVar(FILENAME, uuid, null, false);
-    return raw ? JSON.parse(raw) : [];
+    return safeParse(DiskApi.getVar(FILENAME, uuid, null, false), []);
 }
 
 function getAttendanceBulanIni(uuid) {

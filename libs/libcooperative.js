@@ -25,6 +25,18 @@ function formatTanggal() {
     return now.getFullYear() + "-" + padTwo(now.getMonth() + 1) + "-" + padTwo(now.getDate()) + " " + padTwo(now.getHours()) + ":" + padTwo(now.getMinutes()) + ":" + padTwo(now.getSeconds());
 }
 
+function safeParse(raw, fallback) {
+    if (raw === null || raw === undefined) return fallback;
+    var str = String(raw);
+    if (!str) return fallback;
+    try {
+        return JSON.parse(str);
+    } catch (e) {
+        log.error("[libcooperative] JSON parse error, resetting data: " + e);
+        return fallback;
+    }
+}
+
 function getBalance(uuid) {
     loadAll();
     var raw = DiskApi.getVar(FILENAME_BALANCE, uuid, null, false);
@@ -55,8 +67,7 @@ function deposit(uuid, playerName, amount) {
         var newBalance = current + amount;
         DiskApi.setVar(FILENAME_BALANCE, uuid, newBalance, false);
 
-        var rawLogs = DiskApi.getVar(FILENAME_LOG, "transactions", null, false);
-        var logs = rawLogs ? JSON.parse(rawLogs) : [];
+        var logs = safeParse(DiskApi.getVar(FILENAME_LOG, "transactions", null, false), []);
         logs.push({
             type: "DEPOSIT",
             player: playerName,
@@ -92,8 +103,7 @@ function withdraw(uuid, playerName, amount) {
         var newBalance = current - amount;
         DiskApi.setVar(FILENAME_BALANCE, uuid, newBalance, false);
 
-        var rawLogs = DiskApi.getVar(FILENAME_LOG, "transactions", null, false);
-        var logs = rawLogs ? JSON.parse(rawLogs) : [];
+        var logs = safeParse(DiskApi.getVar(FILENAME_LOG, "transactions", null, false), []);
         logs.push({
             type: "WITHDRAW",
             player: playerName,
@@ -118,8 +128,7 @@ function buyItem(uuid, playerName, itemName) {
 
     try {
         loadAll();
-        var rawMenu = DiskApi.getVar(FILENAME_MENU, "items", null, false);
-        var menu = rawMenu ? JSON.parse(rawMenu) : {};
+        var menu = safeParse(DiskApi.getVar(FILENAME_MENU, "items", null, false), {});
         var key = itemName.toLowerCase();
 
         if (!menu[key]) return { sukses: false, pesan: "Item '" + itemName + "' tidak tersedia di kantin." };
@@ -134,8 +143,7 @@ function buyItem(uuid, playerName, itemName) {
         var newBalance = current - item.price;
         DiskApi.setVar(FILENAME_BALANCE, uuid, newBalance, false);
 
-        var rawLogs = DiskApi.getVar(FILENAME_LOG, "transactions", null, false);
-        var logs = rawLogs ? JSON.parse(rawLogs) : [];
+        var logs = safeParse(DiskApi.getVar(FILENAME_LOG, "transactions", null, false), []);
         logs.push({
             type: "BUY",
             player: playerName,
@@ -161,8 +169,7 @@ function addItemMenu(name, description, price) {
 
     try {
         loadAll();
-        var rawMenu = DiskApi.getVar(FILENAME_MENU, "items", null, false);
-        var menu = rawMenu ? JSON.parse(rawMenu) : {};
+        var menu = safeParse(DiskApi.getVar(FILENAME_MENU, "items", null, false), {});
 
         if (menu[name.toLowerCase()]) {
             return { sukses: false, pesan: "Item '" + name + "' sudah ada di menu." };
@@ -189,8 +196,7 @@ function removeItemMenu(name) {
 
     try {
         loadAll();
-        var rawMenu = DiskApi.getVar(FILENAME_MENU, "items", null, false);
-        var menu = rawMenu ? JSON.parse(rawMenu) : {};
+        var menu = safeParse(DiskApi.getVar(FILENAME_MENU, "items", null, false), {});
         var key = name.toLowerCase();
 
         if (!menu[key]) return { sukses: false, pesan: "Item '" + name + "' tidak ditemukan di menu." };
@@ -207,14 +213,12 @@ function removeItemMenu(name) {
 
 function getMenu() {
     loadAll();
-    var rawMenu = DiskApi.getVar(FILENAME_MENU, "items", null, false);
-    return rawMenu ? JSON.parse(rawMenu) : {};
+    return safeParse(DiskApi.getVar(FILENAME_MENU, "items", null, false), {});
 }
 
 function getTransactionLog(count) {
     loadAll();
-    var rawLogs = DiskApi.getVar(FILENAME_LOG, "transactions", null, false);
-    var logs = rawLogs ? JSON.parse(rawLogs) : [];
+    var logs = safeParse(DiskApi.getVar(FILENAME_LOG, "transactions", null, false), []);
     var limit = count || 10;
     var start = Math.max(0, logs.length - limit);
     var result = [];

@@ -9,6 +9,22 @@ function saveData() {
     DiskApi.saveFile(FILENAME, false, false);
 }
 
+function padTwo(n) {
+    return n < 10 ? "0" + n : "" + n;
+}
+
+function safeParse(raw, fallback) {
+    if (raw === null || raw === undefined) return fallback;
+    var str = String(raw);
+    if (!str) return fallback;
+    try {
+        return JSON.parse(str);
+    } catch (e) {
+        log.error("[libreportcard] JSON parse error, resetting data: " + e);
+        return fallback;
+    }
+}
+
 function calculateAverage(grades) {
     var sum = 0;
     var count = 0;
@@ -31,10 +47,10 @@ function setGrade(uuid, playerName, subject, grade) {
         var rawRecord = DiskApi.getVar(FILENAME, uuid, null, false);
         var record;
 
-        // 2. Jika data ada, parse dari JSON string. Jika tidak, buat object baru
         if (rawRecord) {
-            record = JSON.parse(rawRecord);
-        } else {
+            record = safeParse(rawRecord, null);
+        }
+        if (!record) {
             record = { uuid: uuid, name: playerName, grades: {}, average: 0 };
         }
         
@@ -59,7 +75,7 @@ function getReport(uuid) {
   loadData();
   var rawRecord = DiskApi.getVar(FILENAME, uuid, null, false);
 
-  return rawRecord ? JSON.parse(rawRecord) : null;
+  return safeParse(rawRecord, null);
 }
 
 return {

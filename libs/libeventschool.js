@@ -9,6 +9,18 @@ function saveData() {
     DiskApi.saveFile(FILENAME, false, false);
 }
 
+function safeParse(raw, fallback) {
+    if (raw === null || raw === undefined) return fallback;
+    var str = String(raw);
+    if (!str) return fallback;
+    try {
+        return JSON.parse(str);
+    } catch (e) {
+        log.error("[libeventschool] JSON parse error, resetting data: " + e);
+        return fallback;
+    }
+}
+
 function createEvent(name, date) {
     if (!name || !date) {
         log.error("[libeventschool] Gagal buat event: Nama atau tanggal tidak valid.");
@@ -17,8 +29,7 @@ function createEvent(name, date) {
 
     try {
         loadData();
-        var raw = DiskApi.getVar(FILENAME, "events", null, false);
-        var events = raw ? JSON.parse(raw) : [];
+        var events = safeParse(DiskApi.getVar(FILENAME, "events", null, false), []);
         events.push({ name: name, date: date });
         DiskApi.setVar(FILENAME, "events", JSON.stringify(events), false);
         saveData();
@@ -32,8 +43,7 @@ function createEvent(name, date) {
 
 function getEvents() {
     loadData();
-    var raw = DiskApi.getVar(FILENAME, "events", null, false);
-    return raw ? JSON.parse(raw) : [];
+    return safeParse(DiskApi.getVar(FILENAME, "events", null, false), []);
 }
 
 return {
