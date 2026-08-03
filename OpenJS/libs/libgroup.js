@@ -180,11 +180,12 @@ function getGroupMembers(groupName) {
         var group = lp.getGroupManager().getGroup(groupName);
         if (!group) return [];
 
-        var users = lp.getUserManager().getUsers();
         var members = [];
+        var users = lp.getUserManager().getLoadedUsers();
         var iterator = users.iterator();
         while (iterator.hasNext()) {
             var user = iterator.next();
+            if (user.getName() === null) continue;
             var nodes = user.getNodes();
             var nodeIterator = nodes.iterator();
             while (nodeIterator.hasNext()) {

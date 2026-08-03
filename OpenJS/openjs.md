@@ -87,6 +87,75 @@ Contoh kasus nyata: file `handler/command.js` yang memanggil `requireScript("lib
 
 ---
 
+## 4.5. 🔄 KOREKSI RESMI TERBARU (Diverifikasi Ulang dari Dokumentasi Official)
+
+Bagian ini berisi **koreksi terkonfirmasi** dari dokumentasi resmi yang membetulkan asumsi-asumsi di versi awal file ini. Baca ini SEBELUM bagian 5 kalau ada konflik informasi.
+
+### 🔴 PENTING: `DiskApi.saveFile()` MENGHAPUS DATA DARI MEMORI
+
+Dari dokumentasi resmi (`openjs-components/in-build-classes/diskapi.md`):
+> `saveFile` ... **This will also clear the data from the memory (ram)**
+
+Artinya: setelah `saveFile(...)` dipanggil, kalau kamu langsung `getVar(...)` lagi **tanpa** `loadFile(...)` ulang, hasilnya balik ke `fallbackValue` — bukan data yang baru saja disimpan. Pola yang **salah**:
+```js
+DiskApi.setVar(fileName, key, value, false);
+DiskApi.saveFile(fileName, false, false);
+var cekLagi = DiskApi.getVar(fileName, key, null, false); // ❌ SALAH, kembali ke null!
+```
+Pola yang **benar** — load ulang dulu kalau butuh baca lagi setelah save:
+```js
+DiskApi.setVar(fileName, key, value, false);
+DiskApi.saveFile(fileName, false, false);
+DiskApi.loadFile(fileName, false, false); // WAJIB load ulang sebelum baca lagi
+var cekLagi = DiskApi.getVar(fileName, key, null, false);
+```
+
+### 🔴 PENTING: Aturan `async` Parameter di DiskApi — Kebalikan dari Asumsi Sebelumnya
+
+Dari dokumentasi resmi:
+> If you're using `task.spawn(function() {})` to run your logic off the main thread, you **should set `async = false`** in your DiskApi methods. This avoids double-threading and ensures data is loaded and available in the same thread.
+
+**Artinya:** kalau kode `DiskApi.loadFile`/`saveFile` sudah dipanggil di dalam `task.spawn(...)`, parameter `async` di method DiskApi itu sendiri **harus `false`**, BUKAN `true`. Menyetel `async=true` di dalam `task.spawn` menyebabkan **double-threading** (thread di dalam thread) yang bisa bikin data tidak sinkron.
+
+**Banyak contoh kode di bagian bawah file ini (dan di kode yang pernah dibuat sebelumnya di project) memakai pola `task.spawn(function(){ DiskApi.loadFile(fileName, true, false); ... })` — ini SALAH menurut dokumentasi resmi.** Perbaikan: kalau sudah di dalam `task.spawn`, selalu `async=false`. Kalau **tidak** dibungkus `task.spawn` sama sekali (dipanggil langsung di handler), baru pertimbangkan `async=true` untuk operasi besar.
+
+### 🟡 Sejak OpenJS 1.3.0: Auto-Load Folder dengan `main.js`/`Main.js`
+
+Dari dokumentasi resmi (`archive/managing-and-organizing-scripts-with-folders.md`):
+> Since OpenJS 1.3.0, scripts will get automatically loaded even if they are inside a folder and named main.js/Main.js.
+
+Kalau versi OpenJS di server-mu **1.3.0 ke atas**, folder yang berisi `main.js`/`Main.js` di dalamnya otomatis ter-load, **nama script-nya jadi nama foldernya** (bukan `main.js`). Ini fitur yang lebih baru dari pola manual `//!loadmanually` + `main.js` sentral yang kita bangun manual sebelumnya — cek versi OpenJS-mu dulu sebelum pindah ke pola ini, karena kalau versi lebih lama, fitur ini tidak berlaku.
+
+### 🟡 Path Relatif `".."` — Berlaku di "Fungsi Manapun yang Menerima Path"
+
+Dokumentasi resmi mengonfirmasi:
+> If you want to jump out of the path via any function that expects a path use ".."
+
+Ini mengonfirmasi solusi `../libs/...` yang kita temukan lewat trial-error untuk `requireScript` memang benar secara resmi — dan berlaku umum untuk fungsi manapun yang menerima path, bukan cuma `requireScript`.
+
+### 🟢 `task.entitySchedule()` — Pilihan LEBIH AMAN daripada `task.main()` untuk Cross-Compatibility
+
+Dokumentasi resmi (`in-build-classes/scheduling.md`) menyebut eksplisit:
+> You can still use `task.entitySchedule()` API on non-Folia servers — On traditional Bukkit/Spigot/Paper setups, `task.entitySchedule()` will simply run on the main server thread. This makes it ideal for writing cross-compatible scripts that work on both Folia and non-Folia servers **without needing code changes**.
+
+**Rekomendasi update:** daripada selalu pakai `task.main(fn)` (yang eksplisit **tidak jalan di Folia**, perlu percabangan kode `if isFolia then entitySchedule else main`), lebih baik **default ke `task.entitySchedule(entity, fn)`** untuk kode yang terikat ke 1 entity/player tertentu — otomatis bekerja di kedua jenis server tanpa perlu tulis 2 versi kode. `task.main()` tetap dipakai untuk operasi **tidak terikat entity spesifik** (broadcast server-wide, dispatch command console, dll — yang memang tidak punya "entity" untuk dijadikan konteks).
+
+### 🟢 `task.wait()` di Main Thread — Cuma Warning, Bukan Selalu Fatal
+
+Dokumentasi resmi:
+> **If called on the main server thread, a warning will be logged because this can freeze the server.**
+
+Ini melunakkan klaim sebelumnya bahwa `task.wait()` di main thread selalu berbahaya fatal — kenyataannya cuma **warning log** + risiko freeze (bukan crash/ClassCastException otomatis). `ClassCastException` yang kita alami sebelumnya kemungkinan besar tetap disebabkan kombinasi spesifik (`task.waitForScript` + timing race saat startup plugin), bukan `task.wait()` biasa semata.
+
+### 🟢 Exception di Script Tidak Mematikan Server
+
+Dokumentasi resmi menegaskan:
+> Errors in scripts are caught and logged; they won't crash the server.
+
+Jadi error yang kita alami sebelumnya (`ClassCastException`, dll) **tidak** mematikan seluruh server — cuma menghentikan eksekusi script/fungsi yang error saat itu. Tetap penting pakai `try-catch` untuk kontrol alur (supaya modul lain tetap lanjut load), tapi tidak perlu takut 1 bug script bikin server down total.
+
+---
+
 ## 5. Global API Lengkap
 
 ### 5.1 `script`
@@ -243,13 +312,26 @@ DiskApi.setVar(fileName, key, value, global)
 - `global`: `true` untuk data yang shared lintas-script, `false` untuk data spesifik 1 script (belum terverifikasi detail).
 - Value bisa berupa object/array JS langsung (nested), tidak perlu manual `JSON.stringify`.
 
-**Pola CRUD lengkap (contoh per-player):**
+**Pola CRUD lengkap (contoh per-player, MENGIKUTI ATURAN RESMI async — lihat bagian 4.5):**
 ```js
+// Dipanggil LANGSUNG (tidak di dalam task.spawn) -> boleh async=true untuk data besar
 function simpan(uuid, data) {
     var fileName = "namadata";
     DiskApi.loadFile(fileName, false, false);
     DiskApi.setVar(fileName, uuid, data, false);
     DiskApi.saveFile(fileName, false, false);
+    // INGAT: setelah saveFile, data terhapus dari RAM.
+    // Kalau butuh baca lagi setelah ini, loadFile(...) dulu.
+}
+
+// Dipanggil DI DALAM task.spawn -> WAJIB async=false semua (cegah double-threading)
+function simpanAsync(uuid, data) {
+    task.spawn(function() {
+        var fileName = "namadata";
+        DiskApi.loadFile(fileName, false, false);  // false, BUKAN true, karena sudah di task.spawn
+        DiskApi.setVar(fileName, uuid, data, false);
+        DiskApi.saveFile(fileName, false, false);   // false juga
+    });
 }
 ```
 

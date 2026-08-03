@@ -46,7 +46,11 @@ function ambilKelasSiswa(uuidString) {
 
     if (user === null) {
       var future = luckPerms.getUserManager().loadUser(uuid);
-      user = future.join(); // Fixed: assigned result of future.join()
+      if (future !== null && future.join) {
+        user = future.join();
+      } else if (future !== null && future.orElse) {
+        user = future.orElse(null);
+      }
     }
 
     if (user !== null) {

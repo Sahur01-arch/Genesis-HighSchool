@@ -1,6 +1,6 @@
 //!waitForInit
 const Bukkit = importClass("org.bukkit.Bukkit");
-
+const panel = Bukkit.getConsoleSender();
 log.info("[System] Initializing startup sequence...");
 
 // 1. Wait for required plugins
@@ -58,6 +58,12 @@ task.thread(function() {
             log.error("[System] Failed to initialize after " + (maxRetries + 1) + " attempts. Giving up.");
         }
     }
+});
+
+addCommand("startup", {
+  onCommand: function(sender) {
+    Bukkit.dispatchCommand(panel, "oj load main.js")
+  }
 });
 
 task.bindToUnload(function() {

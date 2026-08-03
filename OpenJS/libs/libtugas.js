@@ -61,15 +61,13 @@ function getChestInventory(namaKelas) {
 }
 
 function simpanChestInventory(namaKelas, inv) {
+  var serialized = serializeItem(inv.getContents());
+
   task.spawn(function() {
     var fileName = "tugas_data";
-    DiskApi.loadFile(fileName, true, false); // Async load
-
-    var contents = inv.getContents();
-    var serialized = serializeItem(contents);
-
+    DiskApi.loadFile(fileName, false, false);
     DiskApi.setVar(fileName, namaKelas, serialized, false);
-    DiskApi.saveFile(fileName, true, false); // Async save
+    DiskApi.saveFile(fileName, false, false);
   });
 }
 

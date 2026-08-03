@@ -26,6 +26,15 @@ registerEvent("org.bukkit.event.inventory.InventoryClickEvent", function(event) 
     }
 });
 
+// --- EVENT LISTENER (Simpan Virtual Chest saat Guru menutupnya) ---
+registerEvent("org.bukkit.event.inventory.InventoryCloseEvent", function(event) {
+    const title = event.getView().getTitle();
+    if (title && title.indexOf(config.inventory.tugasTitlePrefix) === 0) {
+        const namaKelas = title.substring(config.inventory.tugasTitlePrefix.length);
+        Tugas.simpanChestInventory(namaKelas, event.getInventory());
+    }
+});
+
 // --- COMMAND: /kelas ---
 addCommand("kelas", {
   onCommand: function(sender, args) {
@@ -34,7 +43,7 @@ addCommand("kelas", {
         const aksi = jsArgs[0];
 
         if (aksi === "tambah") {
-            if (!sender.hasPermission("under.manage")) {
+            if (!sender.hasPermission("server.kelas")) {
                 sender.sendMessage("§cKamu tidak punya izin untuk mengelola kelas.");
                 return;
             }
@@ -48,7 +57,7 @@ addCommand("kelas", {
         }
 
         if (aksi === "hapus") {
-            if (!sender.hasPermission("under.manage")) {
+            if (!sender.hasPermission("server.kelas")) {
                 sender.sendMessage("§cKamu tidak punya izin untuk mengelola kelas.");
                 return;
             }
@@ -61,7 +70,7 @@ addCommand("kelas", {
         }
 
         if (aksi === "list") {
-            var kelasList = ["kelasa", "kelasb", "kelasc", "kelasd"];
+            var kelasList = ["jurusan_redstone", "jurusan_build", "dkv"];
             var lp = LuckPermsProvider.get();
             sender.sendMessage("§6=== Daftar Kelas ===");
             for (var i = 0; i < kelasList.length; i++) {
@@ -106,7 +115,7 @@ addCommand("kelas", {
         }
 
         if (aksi === "siswa") {
-            if (!sender.hasPermission("under.manage")) {
+            if (!sender.hasPermission("server.kelas")) {
                 sender.sendMessage("§cKamu tidak punya izin untuk melihat daftar siswa.");
                 return;
             }
@@ -127,7 +136,7 @@ addCommand("kelas", {
         }
 
         if (aksi === "masukkan") {
-            if (!sender.hasPermission("under.manage")) {
+            if (!sender.hasPermission("server.kelas")) {
                 sender.sendMessage("§cKamu tidak punya izin untuk mengelola siswa.");
                 return;
             }
@@ -143,7 +152,7 @@ addCommand("kelas", {
         }
 
         if (aksi === "keluarkan") {
-            if (!sender.hasPermission("under.manage")) {
+            if (!sender.hasPermission("server.kelas")) {
                 sender.sendMessage("§cKamu tidak punya izin untuk mengelola siswa.");
                 return;
             }
@@ -159,7 +168,7 @@ addCommand("kelas", {
         }
 
         if (aksi === "setweight") {
-            if (!sender.hasPermission("under.manage")) {
+            if (!sender.hasPermission("server.kelas")) {
                 sender.sendMessage("§cKamu tidak punya izin untuk mengatur weight.");
                 return;
             }
@@ -203,7 +212,7 @@ addCommand("kelas", {
     }
     return toJavaList([]);
   }
-}, "under.manage");
+}, "server.kelas");
 
 // --- COMMAND: /lpgroup ---
 addCommand("lpgroup", {
@@ -245,7 +254,7 @@ addCommand("lpgroup", {
     }
     return toJavaList([]);
   }
-}, "under.manage");
+}, "server.kelas");
 
 // --- COMMAND: /tugas ---
 addCommand("tugas", {
@@ -268,9 +277,7 @@ addCommand("tugas", {
         sender.sendMessage("§cGunakan: /tugas cek <kelas>");
         return;
       }
-      task.main(function() {
-        Tugas.bukaChestUntukGuru(sender, jsArgs[1]);
-      });
+      Tugas.bukaChestUntukGuru(sender, jsArgs[1]);
       return;
     }
 
@@ -288,10 +295,8 @@ addCommand("tugas", {
         return;
       }
 
-      task.main(function() {
-        const hasil = Tugas.submitTugas(sender, namaKelas);
-        sender.sendMessage(hasil.sukses ? "§a" + hasil.pesan : "§c" + hasil.pesan);
-      });
+      const hasil = Tugas.submitTugas(sender, namaKelas);
+      sender.sendMessage(hasil.sukses ? "§a" + hasil.pesan : "§c" + hasil.pesan);
       return;
     }
 
