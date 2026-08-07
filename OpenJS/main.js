@@ -22,7 +22,8 @@ task.thread(function() {
         "libs/libextracurricular.js",
         "libs/libcooperative.js",
         "libs/libgroup.js",
-        "handler/command.js"
+        "handler/command.js",
+        "handler/store.js"
     ];
 
     var maxRetries = 2;
@@ -70,6 +71,7 @@ task.bindToUnload(function() {
     log.info("[System] Unloading modules...");
     // Unload in reverse order
     UnloadScript("handler/command.js");
+    UnloadScript("handler/store.js")
     UnloadScript("libs/libgroup.js");
     UnloadScript("libs/libcooperative.js");
     UnloadScript("libs/libextracurricular.js");
