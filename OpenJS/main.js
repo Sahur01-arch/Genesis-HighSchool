@@ -27,37 +27,25 @@ task.thread(function() {
         "handler/store.js"
     ];
 
-    var maxRetries = 2;
-    var retryDelay = 10;
+var pending = scriptsToLoad.slice();
+    var maxRetries = 3;
+    var retryDelay = 20;
 
-    for (var attempt = 0; attempt <= maxRetries; attempt++) {
-        var hasError = false;
+    for (var attempt = 0; attempt <= maxRetries && pending.length > 0; attempt++) {
+        var stillFailed = [];
 
-        if (attempt > 0) {
-            log.info("[System] Retry attempt " + attempt + "/" + maxRetries + " in " + retryDelay + " seconds...");
-            task.wait(retryDelay);
-        }
-
-        log.info("[System] Starting module loading (attempt " + (attempt + 1) + ")...");
-
-        for (var i = 0; i < scriptsToLoad.length; i++) {
-            var scriptPath = scriptsToLoad[i];
+        for (var i = 0; i < pending.length; i++) {
             try {
-                LoadScript(scriptPath);
-                log.info("[System] Successfully loaded: " + scriptPath);
+                LoadScript(pending[i]);
             } catch (e) {
-                log.error("[System] Failed to load " + scriptPath + ": " + e);
-                hasError = true;
+                stillFailed.push(pending[i]);
             }
         }
 
-        if (!hasError) {
-            log.info("[System] All modules initialized successfully.");
-            break;
-        }
+        pending = stillFailed;
 
-        if (attempt === maxRetries) {
-            log.error("[System] Failed to initialize after " + (maxRetries + 1) + " attempts. Giving up.");
+        if (pending.length > 0 && attempt < maxRetries) {
+            task.wait(retryDelay);
         }
     }
 });
@@ -83,5 +71,6 @@ task.bindToUnload(function() {
     UnloadScript("libs/libtugas.js");
     UnloadScript("libs/libkelas.js");
     UnloadScript("libs/libluckperms.js");
+    UnloadScript("libs/libgift.js")
     log.info("[System] Cleanup complete.");
 });
