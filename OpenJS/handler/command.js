@@ -1182,18 +1182,29 @@ addCommand("setgift", {
 
     // Ambil target player 
     var targetPlayer = Bukkit.getPlayerExact(targetName);
-    var uuid;
+    var uuid = null;
+    var realName = targetName;
 
     if (targetPlayer !== null) {
       uuid = targetPlayer.getUniqueId().toString();
+      realName = targetPlayer.getName();
     } else {
-      // Fallback untuk player offline 
-      var offlinePlayer = Bukkit.getOfflinePlayer(targetName);
-      if (!offlinePlayer || !offlinePlayer.hasPlayedBefore()) {
-        sender.sendMessage("§cPemain '" + targetName + "' tidak pernah bermain di server ini.");
-        return;
+      var offlinePlayers = Bukkit.getOfflinePlayers();
+      for (var i = 0; i < offlinePlayers.length; i++) {
+        var op = offlinePlayers[i];
+        if (op.getName() !== null && op.getName().equalsIgnoreCase(targetName)) {
+          if (op.hasPlayedBefore()) {
+            uuid = op.getUniqueId().toString();
+            realName = op.getName();
+            break;
+          }
+        }
       }
-      uuid = offlinePlayer.getUniqueId().toString();
+    }
+
+    if (!uuid) {
+      sender.sendMessage("§cPemain '" + targetName + "' tidak ditemukan atau belum pernah bermain di server ini.");
+      return;
     }
 
     // panggil fungsi penyimpanan 
@@ -1209,7 +1220,7 @@ addCommand("setgift", {
 
 addCommand("ambilhadiah", {
   onCommand: function(sender, args) {
-    if (!sender.isPlayer()) {
+    if (!(sender instanceof org.bukkit.entity.Player)) {
       sender.sendMessage("Command ini hanya bisa dijalankan player");
       return;
     }
@@ -1217,6 +1228,6 @@ addCommand("ambilhadiah", {
     // Panggol fungsi klaim 
     var hasil = SistemHadiah.klaimHadiahManual(sender);
 
-    sender.sendMessage("hasil.pesan");
+    sender.sendMessage(hasil.pesan);
   }
 })

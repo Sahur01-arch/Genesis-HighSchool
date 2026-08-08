@@ -2,6 +2,7 @@
 var Bukkit = importClass("org.bukkit.Bukkit");
 
 var FILENAME = "birthday_data";
+var bdaysCache = null; // Variabel penampung data di RAM (Cache)
 
 function loadData() {
     DiskApi.loadFile(FILENAME, false, false);
@@ -23,23 +24,36 @@ function safeParse(raw, fallback) {
     }
 }
 
+// === FUNGSI BARU: Mengisi Cache dari Disk (Hanya dipanggil sekali) ===
+function initCache() {
+    if (bdaysCache === null) {
+        loadData();
+        var rawData = DiskApi.getVar(FILENAME, "players", null, false);
+        bdaysCache = safeParse(rawData, {});
+    }
+}
+
+// === FUNGSI BARU: Menyimpan isi Cache ke Disk ===
+function saveCacheToDisk() {
+    DiskApi.setVar(FILENAME, "players", JSON.stringify(bdaysCache), false);
+    saveData();
+}
+
 function padTwo(n) {
     return n < 10 ? "0" + n : "" + n;
 }
 
 function setBirthday(uuid, playerName, dateString) {
     try {
-        loadData();
-        var bdays = safeParse(DiskApi.getVar(FILENAME, "players", null, false), {});
+        initCache(); // Pastikan cache sudah dimuat
         
-        bdays[uuid] = {
+        bdaysCache[uuid] = {
             name: playerName,
             date: dateString, // Format: "dd/mm"
             lastClaimedYear: 0
         };
         
-        DiskApi.setVar(FILENAME, "players", JSON.stringify(bdays), false);
-        saveData();
+        saveCacheToDisk(); // Simpan ke disk karena ini command admin (jarang dipakai)
         return true;
     } catch (e) {
         log.error("Error setBirthday: " + e);
@@ -63,12 +77,12 @@ function giveGift(player) {
 
 function checkAndGiveGift(player) {
     var uuid = player.getUniqueId().toString();
-    loadData();
-    var bdays = safeParse(DiskApi.getVar(FILENAME, "players", null, false), {});
+    initCache(); 
     
-    if (!bdays[uuid]) return; 
+    // Cek langsung dari RAM (Sangat Cepat!)
+    if (!bdaysCache[uuid]) return false; 
     
-    var data = bdays[uuid];
+    var data = bdaysCache[uuid];
     var now = new Date();
     var todayStr = padTwo(now.getDate()) + "/" + padTwo(now.getMonth() + 1);
     var currentYear = now.getFullYear();
@@ -77,23 +91,23 @@ function checkAndGiveGift(player) {
     if (data.date === todayStr && data.lastClaimedYear < currentYear) {
         giveGift(player);
         data.lastClaimedYear = currentYear;
-        bdays[uuid] = data;
+        bdaysCache[uuid] = data; // Perbarui data di RAM
         
-        DiskApi.setVar(FILENAME, "players", JSON.stringify(bdays), false);
-        saveData();
+        return true; // Beri sinyal bahwa ada perubahan data yang perlu di-save
     }
+    
+    return false; // Tidak ada kado yang diberikan
 }
 
 function klaimHadiahManual(player) {
     var uuid = player.getUniqueId().toString();
-    loadData();
-    var bdays = safeParse(DiskApi.getVar(FILENAME, "players", null, false), {});
+    initCache();
     
-    if (!bdays[uuid]) {
+    if (!bdaysCache[uuid]) {
         return { sukses: false, pesan: "§cData ulang tahunmu belum diatur oleh admin." };
     }
     
-    var data = bdays[uuid];
+    var data = bdaysCache[uuid];
     var now = new Date();
     var currentYear = now.getFullYear();
     
@@ -109,10 +123,9 @@ function klaimHadiahManual(player) {
     if (now >= bdayThisYear) {
         giveGift(player);
         data.lastClaimedYear = currentYear;
-        bdays[uuid] = data;
+        bdaysCache[uuid] = data;
         
-        DiskApi.setVar(FILENAME, "players", JSON.stringify(bdays), false);
-        saveData();
+        saveCacheToDisk(); // Simpan ke disk secara instan karena dipicu command
         
         return { sukses: true, pesan: "§aBerhasil! Hadiah ulang tahunmu yang sempat terlewat telah diklaim." };
     } else {
@@ -120,17 +133,45 @@ function klaimHadiahManual(player) {
     }
 }
 
-// === SISTEM LOOP OTOMATIS (Mengecek player online setiap 1 menit) ===
-var plugin = Bukkit.getPluginManager().getPlugin("OpenJS");
-Bukkit.getScheduler().runTaskTimer(plugin, new java.lang.Runnable({
-    run: function() {
-        var onlinePlayers = Bukkit.getOnlinePlayers().iterator();
-        while (onlinePlayers.hasNext()) {
-            var player = onlinePlayers.next();
-            checkAndGiveGift(player);
+// === SISTEM LOOP OTOMATIS (OPTIMASI TPS) ===
+var giftTaskId = null;
+
+function mulaiScheduler() {
+    initCache(); // Muat data ke RAM saat scheduler pertama kali dinyalakan
+    
+    var plugin = Bukkit.getPluginManager().getPlugin("OpenJS");
+    var task = Bukkit.getScheduler().runTaskTimer(plugin, new java.lang.Runnable({
+        run: function() {
+            var onlinePlayers = Bukkit.getOnlinePlayers().iterator();
+            var isDataChanged = false; // Penanda apakah ada perubahan data
+            
+            while (onlinePlayers.hasNext()) {
+                var player = onlinePlayers.next();
+                // Jika checkAndGiveGift mengembalikan 'true', berarti ada yang ulang tahun
+                if (checkAndGiveGift(player)) {
+                    isDataChanged = true;
+                }
+            }
+            
+            // Simpan ke disk HANYA JIKA ada player yang baru saja menerima kado di menit ini
+            if (isDataChanged) {
+                saveCacheToDisk();
+            }
         }
+    }), 0, 1200); // 1200 ticks = 1 menit
+    giftTaskId = task.getTaskId();
+}
+mulaiScheduler();
+
+task.bindToUnload(function() {
+    if (giftTaskId !== null) {
+        Bukkit.getScheduler().cancelTask(giftTaskId);
     }
-}), 0, 1200);
+    // Opsional: Simpan sisa data di memori ke disk sebelum skrip dimatikan
+    if (bdaysCache !== null) {
+        saveCacheToDisk();
+    }
+});
 
 return {
     setBirthday: setBirthday,
