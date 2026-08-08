@@ -22,6 +22,7 @@ task.thread(function() {
         "libs/libextracurricular.js",
         "libs/libcooperative.js",
         "libs/libgroup.js",
+        "libs/libgift.js",
         "handler/command.js",
         "handler/store.js"
     ];

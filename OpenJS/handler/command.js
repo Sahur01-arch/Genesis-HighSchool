@@ -12,6 +12,7 @@ const OrgSys = requireScript("../libs/liborganisasi.js");
 const ExskulSys = requireScript("../libs/libextracurricular.js");
 const KoperasiSys = requireScript("../libs/libcooperative.js");
 const GroupSys = requireScript("../libs/libgroup.js");
+const SistemHadiah = requireScript("../libs/libgift.js");
 
 // --- EVENT LISTENER (Cegah Siswa/Guru Mengambil Item dari Virtual Chest) ---
 registerEvent("org.bukkit.event.inventory.InventoryClickEvent", function(event) {
@@ -1157,3 +1158,65 @@ addCommand("group", {
     }
 }, "server.group.manage");
 
+addCommand("setgift", {
+  onCommand: function(sender, args) {
+    if (!sender.isOp() && !sender.hasPermission("server.setgift")) {
+      sender.sendMessage("§cKamu tidak punya izin memggunakan /setgift")
+      return;
+    }
+
+    if (args.length < 2) {
+      sender.sendMessage("§cGunakan: /setgift <nama_player> <dd/mm>");
+      sender.sendMessage("§eContoh: /setgift Budi 25/12");
+      return;
+    }
+
+    var targetName = args[0];
+    var dateString = args[1];
+
+    // validasi format tanggal
+    if (dateString.length !== 5 || dateString.indexOf("/") === -1) {
+      sender.sendMessage("§cFormat tanggal salah! Gunakan format dd/mm contoh (Contoh: 05/08)");
+      return;
+    }
+
+    // Ambil target player 
+    var targetPlayer = Bukkit.getPlayerExact(targetName);
+    var uuid;
+
+    if (targetPlayer !== null) {
+      uuid = targetPlayer.getUniqueId().toString();
+    } else {
+      // Fallback untuk player offline 
+      var offlinePlayer = Bukkit.getOfflinePlayer(targetName);
+      if (!offlinePlayer || !offlinePlayer.hasPlayedBefore()) {
+        sender.sendMessage("§cPemain '" + targetName + "' tidak pernah bermain di server ini.");
+        return;
+      }
+      uuid = offlinePlayer.getUniqueId().toString();
+    }
+
+    // panggil fungsi penyimpanan 
+    var success = SistemHadiah.setBirthday(uuid, targetName, dateString);
+
+    if (success) {
+      sender.sendMessage("§aBerhasil mengatur tanggal ulang tahun!")
+    } else {
+      sender.sendMessage("§cTerjadi kesalahan saat menyimpan data.");
+    }
+  }
+});
+
+addCommand("ambilhadiah", {
+  onCommand: function(sender, args) {
+    if (!sender.isPlayer()) {
+      sender.sendMessage("Command ini hanya bisa dijalankan player");
+      return;
+    }
+
+    // Panggol fungsi klaim 
+    var hasil = SistemHadiah.klaimHadiahManual(sender);
+
+    sender.sendMessage("hasil.pesan");
+  }
+})
