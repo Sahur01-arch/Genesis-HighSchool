@@ -5,11 +5,9 @@ const kelasManager = requireScript("../libs/libkelas.js");
 const luck = requireScript("../libs/libluckperms.js");
 const Tugas = requireScript("../libs/libtugas.js");
 const config = requireScript("../libs/config.js");
-const ClassSys = requireScript("../libs/libclass.js");
 const EventSys = requireScript("../libs/libeventschool.js");
 const ReportSys = requireScript("../libs/libreportcard.js");
 const OrgSys = requireScript("../libs/liborganisasi.js");
-const ExskulSys = requireScript("../libs/libextracurricular.js");
 const KoperasiSys = requireScript("../libs/libcooperative.js");
 const GroupSys = requireScript("../libs/libgroup.js");
 const SistemHadiah = requireScript("../libs/libgift.js");
@@ -312,73 +310,7 @@ addCommand("tugas", {
   }
 }, "server.tugas.use");
 
-// --- COMMAND: /attendance ---
-addCommand("attendance", {
-    onCommand: function(sender, args) {
-        var jsArgs = toArray(args);
-        var aksi = jsArgs[0];
 
-        if (aksi === "mark") {
-            if (!(sender instanceof org.bukkit.entity.Player)) {
-                sender.sendMessage("§cCommand ini hanya bisa dijalankan di in-game.");
-                return;
-            }
-            var hasil = ClassSys.recordAttendance(sender.getUniqueId().toString(), "Hadir");
-            sender.sendMessage(hasil.sukses ? "§a" + hasil.pesan : "§c" + hasil.pesan);
-            return;
-        }
-
-        if (aksi === "cek") {
-            if (!sender.hasPermission("server.attendance.guru")) {
-                sender.sendMessage("§cKamu tidak punya izin untuk melihat data absensi orang lain.");
-                return;
-            }
-            if (jsArgs.length < 2) {
-                sender.sendMessage("§cGunakan: /attendance cek <nama_player>");
-                return;
-            }
-
-            var targetName = jsArgs[1];
-            var targetPlayer = Bukkit.getPlayer(targetName);
-
-            if (!targetPlayer) {
-                var offlinePlayers = Bukkit.getOfflinePlayers();
-                for (var i = 0; i < offlinePlayers.length; i++) {
-                    if (offlinePlayers[i].getName() != null && offlinePlayers[i].getName().equalsIgnoreCase(targetName)) {
-                        targetPlayer = offlinePlayers[i];
-                        break;
-                    }
-                }
-            }
-
-            if (!targetPlayer || !targetPlayer.hasPlayedBefore()) {
-                sender.sendMessage("§cPlayer '" + targetName + "' tidak ditemukan.");
-                return;
-            }
-
-            ClassSys.tampilkanAbsensi(sender, targetName, targetPlayer.getUniqueId().toString());
-            return;
-        }
-
-        sender.sendMessage("§cGunakan: /attendance mark (siswa) atau /attendance cek <player> (guru)");
-    },
-
-    onTabComplete: function(sender, args) {
-        var jsArgs = toArray(args);
-        if (jsArgs.length === 1) {
-            var opsi = ["mark"];
-            if (sender.hasPermission("server.attendance.guru")) opsi.push("cek");
-            return toJavaList(opsi);
-        }
-        if (jsArgs.length === 2 && jsArgs[0] === "cek") {
-            var names = [];
-            var players = Bukkit.getOnlinePlayers().toArray();
-            for (var i = 0; i < players.length; i++) names.push(players[i].getName());
-            return toJavaList(names);
-        }
-        return toJavaList([]);
-    }
-}, "server.attendance.use");
 
 // --- COMMAND: /event ---
 addCommand("event", {
@@ -693,131 +625,6 @@ addCommand("organisasi", {
         return toJavaList([]);
     }
 }, "server.org.use");
-
-// --- COMMAND: /ekskul ---
-addCommand("ekskul", {
-    onCommand: function(sender, args) {
-        var jsArgs = toArray(args);
-        var aksi = jsArgs[0];
-
-        if (aksi === "buat") {
-            if (!sender.hasPermission("server.ekskul.manage")) {
-                sender.sendMessage("§cKamu tidak punya izin untuk mengelola ekstrakurikuler.");
-                return;
-            }
-            if (jsArgs.length < 2) {
-                sender.sendMessage("§cGunakan: /ekskul buat <nama> [deskripsi] [jadwal]");
-                return;
-            }
-            var desc = jsArgs[2] || "";
-            var schedule = jsArgs[3] || "-";
-            var hasil = ExskulSys.createExtracurricular(jsArgs[1], desc, schedule);
-            sender.sendMessage(hasil.sukses ? "§a" + hasil.pesan : "§c" + hasil.pesan);
-            return;
-        }
-
-        if (aksi === "hapus") {
-            if (!sender.hasPermission("server.ekskul.manage")) {
-                sender.sendMessage("§cKamu tidak punya izin untuk mengelola ekstrakurikuler.");
-                return;
-            }
-            if (jsArgs.length < 2) {
-                sender.sendMessage("§cGunakan: /ekskul hapus <nama>");
-                return;
-            }
-            var hasil = ExskulSys.deleteExtracurricular(jsArgs[1]);
-            sender.sendMessage(hasil.sukses ? "§a" + hasil.pesan : "§c" + hasil.pesan);
-            return;
-        }
-
-        if (aksi === "daftar") {
-            if (!(sender instanceof org.bukkit.entity.Player)) {
-                sender.sendMessage("§cCommand ini hanya bisa dijalankan di in-game.");
-                return;
-            }
-            if (jsArgs.length < 2) {
-                sender.sendMessage("§cGunakan: /ekskul daftar <nama_ekskul>");
-                return;
-            }
-            var hasil = ExskulSys.registerStudent(jsArgs[1], sender.getName(), sender.getUniqueId().toString());
-            sender.sendMessage(hasil.sukses ? "§a" + hasil.pesan : "§c" + hasil.pesan);
-            return;
-        }
-
-        if (aksi === "keluar") {
-            if (!(sender instanceof org.bukkit.entity.Player)) {
-                sender.sendMessage("§cCommand ini hanya bisa dijalankan di in-game.");
-                return;
-            }
-            if (jsArgs.length < 2) {
-                sender.sendMessage("§cGunakan: /ekskul keluar <nama_ekskul>");
-                return;
-            }
-            var hasil = ExskulSys.unregisterStudent(jsArgs[1], sender.getName(), sender.getUniqueId().toString());
-            sender.sendMessage(hasil.sukses ? "§a" + hasil.pesan : "§c" + hasil.pesan);
-            return;
-        }
-
-        if (aksi === "lihat") {
-            if (jsArgs.length < 2) {
-                sender.sendMessage("§cGunakan: /ekskul lihat <nama_ekskul>");
-                return;
-            }
-            var ekskul = ExskulSys.getExtracurricular(jsArgs[1]);
-            if (!ekskul) {
-                sender.sendMessage("§cEkstrakurikuler '" + jsArgs[1] + "' tidak ditemukan.");
-                return;
-            }
-            sender.sendMessage("§6=== " + ekskul.name.toUpperCase() + " ===");
-            if (ekskul.description) sender.sendMessage("§7" + ekskul.description);
-            sender.sendMessage("§fJadwal: §e" + ekskul.schedule);
-            sender.sendMessage("§fAnggota (" + ekskul.members.length + "):");
-            for (var i = 0; i < ekskul.members.length; i++) {
-                sender.sendMessage(" §7- §f" + ekskul.members[i].name);
-            }
-            return;
-        }
-
-        if (aksi === "list") {
-            var list = ExskulSys.listExtracurriculars();
-            if (list.length === 0) {
-                sender.sendMessage("§eBelum ada ekstrakurikuler yang terdaftar.");
-                return;
-            }
-            sender.sendMessage("§6=== Daftar Ekstrakurikuler ===");
-            for (var i = 0; i < list.length; i++) {
-                sender.sendMessage(" §7- §f" + list[i].name + " §7| Jadwal: §e" + list[i].schedule + " §7| Anggota: §f" + list[i].members);
-            }
-            return;
-        }
-
-        if (aksi === "saya") {
-            if (!(sender instanceof org.bukkit.entity.Player)) {
-                sender.sendMessage("§cCommand ini hanya bisa dijalankan di in-game.");
-                return;
-            }
-            var myEkskuls = ExskulSys.getExtracurricularsForMember(sender.getUniqueId().toString());
-            if (myEkskuls.length === 0) {
-                sender.sendMessage("§eKamu belum terdaftar di ekstrakurikuler manapun.");
-                return;
-            }
-            sender.sendMessage("§6=== Ekskul-ku ===");
-            for (var i = 0; i < myEkskuls.length; i++) {
-                sender.sendMessage(" §7- §f" + myEkskuls[i].name + " §7| Jadwal: §e" + myEkskuls[i].schedule);
-            }
-            return;
-        }
-
-        sender.sendMessage("§cGunakan: /ekskul buat|hapus|daftar|keluar|lihat|list|saya");
-    },
-    onTabComplete: function(sender, args) {
-        var jsArgs = toArray(args);
-        if (jsArgs.length === 1) {
-            return toJavaList(["buat", "hapus", "daftar", "keluar", "lihat", "list", "saya"]);
-        }
-        return toJavaList([]);
-    }
-}, "server.ekskul.use");
 
 // --- COMMAND: /koperasi ---
 addCommand("koperasi", {
