@@ -9,25 +9,38 @@ log.info("[System] Dependencies loaded.");
 
 // 2. Perform loading in a dedicated thread to avoid blocking main thread
 task.thread(function() {
-    task.wait(1); // ADDED: Delay to allow initialization to finish
+    task.wait(1);
+
+    // KONEKSI MYSQL PERTAMA KALI SEBELUM SCRIPT LAIN DIMUAT
+    try {
+        LoadScript("libs/libmysql.js");
+        const MySQLInit = requireScript("libs/libmysql.js");
+        MySQLInit.initTables();
+        log.info("[System] MySQL module & tables initialized successfully.");
+    } catch (e) {
+        log.error("[System] Failed to load MySQL module: " + e);
+    }
+    
+    // Beri jeda sejenak untuk memastikan tabel dan koneksi siap
+    task.wait(1);
 
     const scriptsToLoad = [
         "libs/libluckperms.js",
         "libs/libkelas.js",
         "libs/libtugas.js",
-        "libs/libclass.js",
         "libs/libeventschool.js",
         "libs/libreportcard.js",
         "libs/liborganisasi.js",
-        "libs/libextracurricular.js",
+        "libs/absenhandler.js", // Absen dimuat SETELAH libextracurricular dan MySQL
         "libs/libcooperative.js",
         "libs/libgroup.js",
         "libs/libgift.js",
+        "handler/absenhandler.js",
         "handler/command.js",
         "handler/store.js"
     ];
 
-var pending = scriptsToLoad.slice();
+    var pending = scriptsToLoad.slice();
     var maxRetries = 3;
     var retryDelay = 20;
 
@@ -48,29 +61,30 @@ var pending = scriptsToLoad.slice();
             task.wait(retryDelay);
         }
     }
+    
+    log.info("[System] All scripts loading sequence complete.");
 });
 
 addCommand("startup", {
   onCommand: function(sender) {
-    Bukkit.dispatchCommand(panel, "oj load main.js")
+    Bukkit.dispatchCommand(panel, "oj load main.js");
   }
 });
 
 task.bindToUnload(function() {
     log.info("[System] Unloading modules...");
-    // Unload in reverse order
     UnloadScript("handler/command.js");
-    UnloadScript("handler/store.js")
+    UnloadScript("handler/store.js");
     UnloadScript("libs/libgroup.js");
     UnloadScript("libs/libcooperative.js");
-    UnloadScript("libs/libextracurricular.js");
+    UnloadScript("handler/absenhandler.js");
     UnloadScript("libs/liborganisasi.js");
     UnloadScript("libs/libreportcard.js");
     UnloadScript("libs/libeventschool.js");
-    UnloadScript("libs/libclass.js");
     UnloadScript("libs/libtugas.js");
     UnloadScript("libs/libkelas.js");
     UnloadScript("libs/libluckperms.js");
-    UnloadScript("libs/libgift.js")
+    UnloadScript("libs/libgift.js");
+    UnloadScript("libs/libmysql.js");
     log.info("[System] Cleanup complete.");
 });

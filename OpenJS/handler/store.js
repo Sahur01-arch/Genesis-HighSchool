@@ -2,9 +2,7 @@
 
 const Bukkit = importClass("org.bukkit.Bukkit");
 const Material = importClass("org.bukkit.Material");
-const ItemStack = importClass("org.bukkit.inventory.ItemStack");
-const ChatColor = importClass("org.bukkit.ChatColor");
-const Player = importClass("org.bukkit.entity.Player");
+const InventoryApi = Services.get("InventoryApi");
 
 var PREFIX = "§8[§bServerStore§8] §r";
 var PERM_ADMIN = "store.admin";
@@ -14,7 +12,7 @@ var adminSessions = {};
 var GAMEPASS_FALLBACK_LIST = ["coal", "iron_ingot", "gold_ingot", "diamond", "netherite_ingot"];
 var RANK_FALLBACK_LIST = ["netherite_ingot", "emerald", "nether_star"];
 
-// Daftar hitam blok/item terlarang admin (format resmi Minecraft)
+// Daftar hitam blok/item terlarang admin
 var BLACKLISTED_MATERIALS = [
     "BARRIER", "COMMAND_BLOCK", "CHAIN_COMMAND_BLOCK", "REPEATING_COMMAND_BLOCK",
     "COMMAND_BLOCK_MINECART", "STRUCTURE_BLOCK", "STRUCTURE_VOID", "JIGSAW", "BEDROCK",
@@ -26,20 +24,15 @@ function isBlacklisted(matName) {
     for (var i = 0; i < BLACKLISTED_MATERIALS.length; i++) {
         if (BLACKLISTED_MATERIALS[i] === upper) return true;
     }
-    // Blokir juga item yang berupa legacy atau tidak bisa ditaruh item stack bersih
     if (upper.indexOf("LEGACY_") !== -1) return true;
     return false;
 }
 
-function resolveMaterial(inputName, isRank) {
+function getSafeMaterialId(inputName, isRank) {
     if (!inputName) {
-        if (isRank) {
-            var randIdx = Math.floor(Math.random() * RANK_FALLBACK_LIST.length);
-            inputName = RANK_FALLBACK_LIST[randIdx];
-        } else {
-            var randIdx2 = Math.floor(Math.random() * GAMEPASS_FALLBACK_LIST.length);
-            inputName = GAMEPASS_FALLBACK_LIST[randIdx2];
-        }
+        inputName = isRank 
+            ? RANK_FALLBACK_LIST[Math.floor(Math.random() * RANK_FALLBACK_LIST.length)] 
+            : GAMEPASS_FALLBACK_LIST[Math.floor(Math.random() * GAMEPASS_FALLBACK_LIST.length)];
     }
     
     var clean = inputName.toUpperCase().trim();
@@ -49,14 +42,13 @@ function resolveMaterial(inputName, isRank) {
     
     var mat = Material.getMaterial(clean);
     if (!mat) {
-        mat = Material.getMaterial(isRank ? "NETHER_STAR" : "PAPER");
-        if (!mat) mat = Material.PAPER;
+        clean = isRank ? "NETHER_STAR" : "PAPER";
     }
-    return mat;
+    return clean.toLowerCase(); // Format ID Minecraft standar
 }
 
 // -----------------------------------------------------------------------------
-// [1] DATABASE SYSTEM
+// [1] DATABASE SYSTEM (STANDAR BARU)
 // -----------------------------------------------------------------------------
 function getDB() {
     DiskApi.loadFile(DB_FILE, false, false);
@@ -74,19 +66,15 @@ function getDB() {
 function saveDB(dataObj) {
     DiskApi.loadFile(DB_FILE, false, false);
     DiskApi.setVar(DB_FILE, "data", dataObj, false);
-    DiskApi.saveFile(DB_FILE, false, false);
-    DiskApi.loadFile(DB_FILE, false, false);
+    DiskApi.saveFile(DB_FILE, false, false); // Menghapus dari RAM
+    DiskApi.loadFile(DB_FILE, false, false); // Load kembali ke RAM
 }
 
 // -----------------------------------------------------------------------------
-// [2] BUKKIT UTILITIES & SENDER CHECK
+// [2] BUKKIT UTILITIES & LUCKPERMS EXECUTION
 // -----------------------------------------------------------------------------
-function color(text) {
-    return ChatColor.translateAlternateColorCodes('&', text);
-}
-
 function isPlayer(sender) {
-    return sender instanceof Player;
+    return typeof sender.hasPermission === "function" && sender.getName() !== "CONSOLE";
 }
 
 function executeLuckPerms(type, target, node, duration) {
@@ -95,12 +83,14 @@ function executeLuckPerms(type, target, node, duration) {
         var cmd = "";
         
         if (type === "gamepass") {
+            // Gamepass bisa node permission bebas atau group (menggunakan prefix group.nama_grup)
             if (duration === "perm" || duration === "permanent") {
                 cmd = "lp user " + target + " permission set " + node + " true";
             } else {
                 cmd = "lp user " + target + " permission settemp " + node + " true " + duration;
             }
         } else {
+            // Rankbuy didedikasikan untuk parent add grup
             if (duration === "perm" || duration === "permanent") {
                 cmd = "lp user " + target + " parent add " + node;
             } else {
@@ -111,167 +101,145 @@ function executeLuckPerms(type, target, node, duration) {
     });
 }
 
-function createCustomItem(mat, name, loreArray) {
-    if (!mat) mat = Material.PAPER;
-    var item = new ItemStack(mat);
-    var meta = item.getItemMeta();
-    meta.setDisplayName(color(name));
-    
-    if (loreArray && loreArray.length > 0) {
-        var loreList = new java.util.ArrayList();
-        for (var i = 0; i < loreArray.length; i++) {
-            loreList.add(color(loreArray[i]));
-        }
-        meta.setLore(loreList);
-    }
-    item.setItemMeta(meta);
-    return item;
-}
-
 // -----------------------------------------------------------------------------
-// [3] GUI MENUS
+// [3] GUI MENUS (MENGGUNAKAN INVENTORYAPI STANDAR BARU)
 // -----------------------------------------------------------------------------
 function openMainMenu(player) {
-    var inv = Bukkit.createInventory(null, 27, color("&8&l🛒 Store Admin Panel"));
-    inv.setItem(11, createCustomItem(Material.EMERALD, "&a&lKelola Gamepass", ["&7Kelola daftar Gamepass server."]));
-    inv.setItem(15, createCustomItem(Material.DIAMOND, "&b&lKelola Ranks", ["&7Kelola daftar Ranks server."]));
-    player.openInventory(inv);
+    var menu = InventoryApi.constructInventory("single", "§8§l🛒 Store Admin Panel");
+    
+    var gpItem = InventoryApi.createItem({ id: "minecraft:emerald", name: "§a§lKelola Gamepass", lore: ["§7Kelola daftar Gamepass server."] });
+    var rankItem = InventoryApi.createItem({ id: "minecraft:diamond", name: "§b§lKelola Ranks", lore: ["§7Kelola daftar Ranks server."] });
+    
+    menu.setSlot(11, gpItem);
+    menu.setSlot(15, rankItem);
+    
+    menu.onLeftClick(function(p, slot, event) {
+        event.setCancelled(true);
+        if (slot === 11) { menu.hide(p); openListMenu(p, "gamepass"); }
+        if (slot === 15) { menu.hide(p); openListMenu(p, "rank"); }
+    });
+    
+    menu.onClosed(function() { menu.destroy(); });
+    menu.show(player);
 }
 
 function openListMenu(player, type) {
-    var invName = type === "gamepass" ? "&a&lDaftar Gamepass" : "&b&lDaftar Ranks";
-    var inv = Bukkit.createInventory(null, 54, color(invName));
+    var invName = type === "gamepass" ? "§a§lDaftar Gamepass" : "§b§lDaftar Ranks";
+    var menu = InventoryApi.constructInventory("double", invName); 
     
     var db = getDB();
     var objData = type === "gamepass" ? db.gamepasses : db.ranks;
     var isRank = (type === "rank");
     
     var slot = 0;
+    var keys = [];
+    
     for (var key in objData) {
         if (Object.prototype.hasOwnProperty.call(objData, key)) {
             if (slot >= 53) break;
             var itemData = objData[key];
             var nodeVal = (typeof itemData === "object") ? itemData.node : itemData;
             var logoVal = (typeof itemData === "object") ? itemData.logo : (isRank ? "nether_star" : "coal");
-            var mat = resolveMaterial(logoVal, isRank);
+            var mat = getSafeMaterialId(logoVal, isRank);
             
-            inv.setItem(slot, createCustomItem(mat, "&e&l" + key.toUpperCase(), [
-                "&7Tipe: &f" + type,
-                "&7Target (Node/Group): &f" + nodeVal,
-                "&7Material: &e" + logoVal.toLowerCase(),
-                "",
-                "&a▶ Klik untuk berikan ke player!"
-            ]));
+            var item = InventoryApi.createItem({
+                id: "minecraft:" + mat,
+                name: "§e§l" + key.toUpperCase(),
+                lore: [
+                    "§7Tipe: §f" + type,
+                    "§7Target (Node/Group): §f" + nodeVal,
+                    "§7Material: §e" + mat,
+                    "",
+                    "§a▶ Klik untuk berikan ke player!"
+                ]
+            });
+            
+            menu.setSlot(slot, item);
+            keys[slot] = key;
             slot++;
         }
     }
-    player.openInventory(inv);
+    
+    menu.onLeftClick(function(p, clickedSlot, event) {
+        event.setCancelled(true);
+        if (keys[clickedSlot]) {
+            menu.hide(p);
+            openDurationMenu(p, type, keys[clickedSlot], null);
+        }
+    });
+    
+    menu.onClosed(function() { menu.destroy(); });
+    menu.show(player);
 }
 
-function openDurationMenu(player) {
-    var session = adminSessions[player.getName()];
-    if (!session) return;
+function openDurationMenu(player, type, itemKey, targetName) {
+    var menu = InventoryApi.constructInventory("single", "§8§lBerikan: " + itemKey.toUpperCase());
+    var displayTarget = targetName ? "§b" + targetName : "§cBelum Diatur (Klik buku)";
     
-    var targetName = session.target ? "&b" + session.target : "&cBelum Diatur (Klik buku)";
-    var inv = Bukkit.createInventory(null, 27, color("&8&lBerikan: " + session.itemKey.toUpperCase()));
+    var book = InventoryApi.createItem({
+        id: "minecraft:written_book",
+        name: "§e§lTarget Player",
+        lore: [
+            "§7Player Terpilih: " + displayTarget,
+            "",
+            "§a▶ Klik untuk mengetik nama player",
+            "§a  secara manual di chat!"
+        ]
+    });
     
-    inv.setItem(4, createCustomItem(Material.WRITTEN_BOOK, "&e&lTarget Player", [
-        "&7Player Terpilih: " + targetName,
-        "",
-        "&a▶ Klik untuk mengetik nama player",
-        "&a  secara manual di chat!"
-    ]));
+    menu.setSlot(4, book);
+    menu.setSlot(11, InventoryApi.createItem({ id: "minecraft:iron_ingot", name: "§f§l7 Hari", lore: ["§7Berikan akses 7 hari."] }));
+    menu.setSlot(13, InventoryApi.createItem({ id: "minecraft:gold_ingot", name: "§6§l30 Hari", lore: ["§7Berikan akses 30 hari."] }));
+    menu.setSlot(15, InventoryApi.createItem({ id: "minecraft:nether_star", name: "§c§lPermanen", lore: ["§7Berikan akses permanen."] }));
     
-    inv.setItem(11, createCustomItem(Material.IRON_INGOT, "&f&l7 Hari (1 Minggu)", ["&7Berikan akses 7 hari."]));
-    inv.setItem(13, createCustomItem(Material.GOLD_INGOT, "&6&l30 Hari (1 Bulan)", ["&7Berikan akses 30 hari."]));
-    inv.setItem(15, createCustomItem(Material.NETHER_STAR, "&c&lPermanen", ["&7Berikan akses permanen."]));
+    menu.onLeftClick(function(p, slot, event) {
+        event.setCancelled(true);
+        if (slot === 4) {
+            menu.hide(p);
+            adminSessions[p.getName()] = {
+                type: type,
+                itemKey: itemKey,
+                state: "typing_target"
+            };
+            p.sendMessage(PREFIX + "§aSilahkan ketik §enama player target§a di chat!");
+            p.sendMessage(PREFIX + "§7(Ketik 'cancel' untuk membatalkan)");
+        } 
+        else if (slot === 11 || slot === 13 || slot === 15) {
+            if (!targetName) {
+                p.sendMessage(PREFIX + "§cAnda harus mengatur Target Player terlebih dahulu!");
+                return;
+            }
+            var duration = (slot === 11) ? "7d" : (slot === 13) ? "30d" : "perm";
+            var db = getDB();
+            var rawData = type === "gamepass" ? db.gamepasses[itemKey] : db.ranks[itemKey];
+            
+            if (rawData) {
+                var node = (typeof rawData === "object") ? rawData.node : rawData;
+                executeLuckPerms(type, targetName, node, duration);
+                p.sendMessage(PREFIX + "§aBerhasil memproses " + itemKey.toUpperCase() + " kepada " + targetName + "!");
+            }
+            menu.hide(p);
+        }
+    });
     
-    player.openInventory(inv);
+    menu.onClosed(function() { menu.destroy(); });
+    menu.show(player);
 }
 
 // -----------------------------------------------------------------------------
-// [4] EVENT HANDLERS
+// [4] EVENT HANDLER (KHUSUS CHAT UNTUK TARGET PLAYER)
 // -----------------------------------------------------------------------------
-var invListener = registerEvent("org.bukkit.event.inventory.InventoryClickEvent", function(event) {
-    var title = ChatColor.stripColor(event.getView().getTitle());
-    
-    if (title.indexOf("Store Admin") === -1 && title.indexOf("Daftar Gamepass") === -1 && title.indexOf("Daftar Ranks") === -1 && title.indexOf("Berikan: ") === -1) {
-        return;
-    }
-    
-    event.setCancelled(true);
-    var player = event.getWhoClicked();
-    if (!isPlayer(player)) return;
-    
-    var clickedItem = event.getCurrentItem();
-    if (!clickedItem || clickedItem.getType() === Material.AIR) return;
-    
-    var itemName = ChatColor.stripColor(clickedItem.getItemMeta().getDisplayName());
-    
-    if (title.indexOf("Store Admin") !== -1) {
-        if (itemName.indexOf("Kelola Gamepass") !== -1) openListMenu(player, "gamepass");
-        if (itemName.indexOf("Kelola Ranks") !== -1) openListMenu(player, "rank");
-        return;
-    }
-    
-    if (title.indexOf("Daftar Gamepass") !== -1 || title.indexOf("Daftar Ranks") !== -1) {
-        var type = title.indexOf("Gamepass") !== -1 ? "gamepass" : "rank";
-        var key = itemName.toLowerCase();
-        
-        adminSessions[player.getName()] = {
-            type: type,
-            itemKey: key,
-            target: null,
-            state: "selecting_duration"
-        };
-        openDurationMenu(player);
-        return;
-    }
-    
-    if (title.indexOf("Berikan: ") !== -1) {
-        var session = adminSessions[player.getName()];
-        if (!session) return;
-        
-        if (itemName.indexOf("Target Player") !== -1) {
-            session.state = "typing_target";
-            player.closeInventory();
-            player.sendMessage(PREFIX + "§aSilahkan ketik §enama player target§a di chat!");
-            player.sendMessage(PREFIX + "§7(Ketik 'cancel' untuk membatalkan)");
-            return;
-        }
-        
-        if (!session.target) {
-            player.sendMessage(PREFIX + "§cAnda harus mengatur Target Player terlebih dahulu!");
-            return;
-        }
-        
-        var duration = "";
-        if (itemName.indexOf("7 Hari") !== -1) duration = "7d";
-        else if (itemName.indexOf("30 Hari") !== -1) duration = "30d";
-        else if (itemName.indexOf("Permanen") !== -1) duration = "perm";
-        else return;
-        
-        var db = getDB();
-        var rawData = session.type === "gamepass" ? db.gamepasses[session.itemKey] : db.ranks[session.itemKey];
-        var node = (typeof rawData === "object") ? rawData.node : rawData;
-        
-        executeLuckPerms(session.type, session.target, node, duration);
-        player.sendMessage(PREFIX + "§aBerhasil memproses " + session.itemKey.toUpperCase() + " kepada " + session.target + "!");
-        player.closeInventory();
-        delete adminSessions[player.getName()];
-    }
-});
-
 var chatListener = registerEvent("org.bukkit.event.player.AsyncPlayerChatEvent", function(event) {
     var player = event.getPlayer();
-    var session = adminSessions[player.getName()];
+    var pName = player.getName();
+    var session = adminSessions[pName];
     
     if (session && session.state === "typing_target") {
         event.setCancelled(true);
         var msg = event.getMessage().trim();
         
         if (msg.toLowerCase() === "cancel") {
-            delete adminSessions[player.getName()];
+            delete adminSessions[pName];
             player.sendMessage(PREFIX + "§cPemilihan dibatalkan.");
             return;
         }
@@ -281,17 +249,19 @@ var chatListener = registerEvent("org.bukkit.event.player.AsyncPlayerChatEvent",
             return;
         }
         
-        session.target = msg;
-        session.state = "selecting_duration";
+        var type = session.type;
+        var itemKey = session.itemKey;
+        
+        delete adminSessions[pName]; // Hapus state sebelum mengembalikan UI
         
         task.main(function() {
-            openDurationMenu(player);
+            openDurationMenu(player, type, itemKey, msg);
         });
     }
 });
 
 // -----------------------------------------------------------------------------
-// [5] COMMAND REGISTRATION DENGAN DYNAMIC BUKKIT ITEM TABCOMPLETE
+// [5] COMMAND REGISTRATION
 // -----------------------------------------------------------------------------
 addCommand("storeadmin", {
     onCommand: function(sender, args) {
@@ -316,71 +286,80 @@ function handleStoreCommand(sender, jsArgs, type) {
     var objData = type === "gamepass" ? db.gamepasses : db.ranks;
     var isRank = (type === "rank");
 
-    if (jsArgs.length < 2) {
-        sender.sendMessage(PREFIX + "§cFormat: §e/" + type + " <tambah|remove|set> <nama> [node/player] [material/durasi] [durasi]");
+    if (jsArgs.length === 0) {
+        var cmdName = type === "rank" ? "rankbuy" : "gamepass";
+        sender.sendMessage(PREFIX + "§cFormat: §e/" + cmdName + " <tambah|remove|set|list> ...");
         return;
     }
 
     var action = jsArgs[0].toLowerCase();
-    var name = jsArgs[1].toLowerCase();
+    
+    // Command baru untuk melihat list langsung tanpa harus lewat GUI Utama Store Admin
+    if (action === "list") {
+        if (!isPlayer(sender)) {
+            sender.sendMessage("§cHanya player yang bisa menggunakan UI ini.");
+            return;
+        }
+        openListMenu(sender, type);
+        return;
+    }
 
     if (action === "tambah") {
         if (jsArgs.length < 3) {
-            sender.sendMessage(PREFIX + "§cTentukan node permission/group!"); return;
+            if (type === "gamepass") {
+                sender.sendMessage(PREFIX + "§cFormat: §e/gamepass tambah <nama_item> <node_atau_group> [logo_item]");
+                sender.sendMessage(PREFIX + "§7(Info: Gunakan format §fgroup.nama_grup§7 untuk membagikan Bundle/Grup)");
+            } else {
+                sender.sendMessage(PREFIX + "§cFormat: §e/rankbuy tambah <nama_item> <nama_grup> [logo_item]");
+            }
+            return;
         }
-        var nodeVal = jsArgs[2];
+        
+        var name = jsArgs[1].toLowerCase();
+        var nodeVal = jsArgs[2]; 
         var logoVal = jsArgs[3] ? jsArgs[3].toLowerCase() : null;
         
-        var finalLogo = "";
-        if (logoVal) {
-            if (isBlacklisted(logoVal) || !Material.getMaterial(logoVal.toUpperCase())) {
-                finalLogo = isRank ? "nether_star" : "diamond";
-                sender.sendMessage(PREFIX + "§cItem tersebut dilarang atau tidak valid! Menggunakan logo fallback.");
-            } else {
-                finalLogo = logoVal;
-            }
-        } else {
-            if (isRank) {
-                var randIdx = Math.floor(Math.random() * RANK_FALLBACK_LIST.length);
-                finalLogo = RANK_FALLBACK_LIST[randIdx];
-            } else {
-                var randIdx2 = Math.floor(Math.random() * GAMEPASS_FALLBACK_LIST.length);
-                finalLogo = GAMEPASS_FALLBACK_LIST[randIdx2];
-            }
-            sender.sendMessage(PREFIX + "§7Logo material tidak diisi, sistem menggunakan fallback: §e" + finalLogo);
-        }
+        var finalLogo = getSafeMaterialId(logoVal, isRank);
         
         objData[name] = { node: nodeVal, logo: finalLogo };
         saveDB(db);
-        sender.sendMessage(PREFIX + "§a" + type + " §e" + name + " §aberhasil ditambahkan dengan material §b" + finalLogo.toUpperCase() + "!");
+        sender.sendMessage(PREFIX + "§aData §e" + name + " §aberhasil ditambahkan dengan logo material §b" + finalLogo.toUpperCase() + "!");
     } 
     else if (action === "remove") {
-        if (objData[name]) {
-            delete objData[name];
+        if (jsArgs.length < 2) {
+            sender.sendMessage(PREFIX + "§cTentukan nama item untuk dihapus."); return;
+        }
+        var targetName = jsArgs[1].toLowerCase();
+        
+        if (objData[targetName]) {
+            delete objData[targetName];
             saveDB(db);
-            sender.sendMessage(PREFIX + "§a" + type + " §e" + name + " §aberhasil dihapus!");
+            sender.sendMessage(PREFIX + "§aBerhasil dihapus dari sistem!");
         } else {
-            sender.sendMessage(PREFIX + "§cItem tidak ditemukan dalam database.");
+            sender.sendMessage(PREFIX + "§cItem tidak ditemukan.");
         }
     } 
     else if (action === "set") {
         if (jsArgs.length < 4) {
-            sender.sendMessage(PREFIX + "§cFormat: §e/" + type + " set <nama_item> <player> <7d|30d|perm>"); return;
+            sender.sendMessage(PREFIX + "§cFormat: §e/" + (type==="rank"?"rankbuy":type) + " set <nama_item> <player> <7d|30d|perm>"); return;
         }
+        
+        var setName = jsArgs[1].toLowerCase();
         var target = jsArgs[2];
         var durasi = jsArgs[3].toLowerCase();
         
-        if (!objData[name]) {
+        if (!objData[setName]) {
             sender.sendMessage(PREFIX + "§cItem tidak terdaftar di sistem."); return;
         }
         
-        var rawData = objData[name];
-        var nodeVal = (typeof rawData === "object") ? rawData.node : rawData;
+        var rawData = objData[setName];
+        var setNodeVal = (typeof rawData === "object") ? rawData.node : rawData;
         
-        executeLuckPerms(type, target, nodeVal, durasi);
-        sender.sendMessage(PREFIX + "§aSukses memberikan §e" + name + " §akepada §b" + target);
-    } else {
-        sender.sendMessage(PREFIX + "§cAksi tidak dikenal. Gunakan: tambah, remove, atau set");
+        executeLuckPerms(type, target, setNodeVal, durasi);
+        sender.sendMessage(PREFIX + "§aSukses memberikan §e" + setName + " §akepada §b" + target);
+    } 
+    else {
+        sender.sendMessage(PREFIX + "§cAksi tidak dikenal. Gunakan: tambah, remove, set, list");
     }
 }
 
@@ -391,7 +370,7 @@ function handleTabComplete(sender, args, type) {
     var objData = type === "gamepass" ? db.gamepasses : db.ranks;
 
     if (jsArgs.length === 1) {
-        suggestions = ["tambah", "remove", "set"];
+        suggestions = ["tambah", "remove", "set", "list"];
     } else if (jsArgs.length === 2) {
         for (var key in objData) {
             if (Object.prototype.hasOwnProperty.call(objData, key)) {
@@ -401,11 +380,9 @@ function handleTabComplete(sender, args, type) {
     } else if (jsArgs.length === 3) {
         var action = jsArgs[0].toLowerCase();
         if (action === "tambah") {
-            // Ambil SEMUA material resmi dari class Bukkit Material secara dinamis
             var allMats = Material.values();
             for (var i = 0; i < allMats.length; i++) {
                 var matName = allMats[i].name().toLowerCase();
-                // Hanya masukkan yang bisa dipakai item stack biasa dan tidak di-blacklist
                 if (allMats[i].isItem() && !isBlacklisted(matName)) {
                     suggestions.push(matName);
                 }
@@ -418,19 +395,18 @@ function handleTabComplete(sender, args, type) {
             }
         }
     } else if (jsArgs.length === 4) {
-        var action = jsArgs[0].toLowerCase();
-        if (action === "set") {
+        var actionCheck = jsArgs[0].toLowerCase();
+        if (actionCheck === "set") {
             suggestions = ["7d", "30d", "perm"];
         }
     }
 
     var currentInput = jsArgs[jsArgs.length - 1].toLowerCase();
     var filtered = [];
-    for (var i = 0; i < suggestions.length; i++) {
-        // Batasi maksimal 80 saran agar tidak membebani buffer network packet client Minecraft
+    for (var j = 0; j < suggestions.length; j++) {
         if (filtered.length >= 80) break;
-        if (suggestions[i].toLowerCase().indexOf(currentInput) === 0) {
-            filtered.push(suggestions[i]);
+        if (suggestions[j].toLowerCase().indexOf(currentInput) === 0) {
+            filtered.push(suggestions[j]);
         }
     }
 
@@ -443,15 +419,17 @@ addCommand("gamepass", {
 }, PERM_ADMIN);
 
 addCommand("rankbuy", {
-    onCommand: function(sender, args) { handleStoreCommand(sender, toArray(args), "rankbuy"); },
-    onTabComplete: function(sender, args) { return handleTabComplete(sender, args, "rankbuy"); }
+    onCommand: function(sender, args) { handleStoreCommand(sender, toArray(args), "rank"); }, // Flag as 'rank' internal
+    onTabComplete: function(sender, args) { return handleTabComplete(sender, args, "rank"); }
 }, PERM_ADMIN);
 
 // -----------------------------------------------------------------------------
-// [6] CLEANUP SAAT UNLOAD
+// [6] CLEANUP
 // -----------------------------------------------------------------------------
 task.bindToUnload(function() {
-    unregisterEvent(invListener);
+    // InventoryApi sudah menghandle GUI tanpa butuh listener native, 
+    // jadi kita hanya cukup melepas chatListener
     unregisterEvent(chatListener);
-    log.info("[StoreSystem] Event listeners berhasil dibersihkan dengan aman.");
+    log.info("[StoreSystem] Script dinonaktifkan dengan aman.");
 });
+
