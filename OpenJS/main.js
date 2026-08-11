@@ -35,6 +35,7 @@ task.thread(function() {
         "libs/libcooperative.js",
         "libs/libgroup.js",
         "libs/libgift.js",
+        "handler/kelasgui.js",
         "handler/absenhandler.js",
         "handler/command.js",
         "handler/store.js"
@@ -78,6 +79,7 @@ task.bindToUnload(function() {
     UnloadScript("libs/libgroup.js");
     UnloadScript("libs/libcooperative.js");
     UnloadScript("handler/absenhandler.js");
+    UnloadScript("handler/kelasgui.js");
     UnloadScript("libs/liborganisasi.js");
     UnloadScript("libs/libreportcard.js");
     UnloadScript("libs/libeventschool.js");
