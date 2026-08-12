@@ -195,8 +195,6 @@ Crate:
       Weight: 16
       Commands:
         - "eco give %player% 15000"
-      Items:
-        - "Item:gold_block, Amount:1"
     "2":
       DisplayName: "Netherite Scrap"
       DisplayItem: "netherite_scrap"
@@ -324,6 +322,4 @@ Crate:
       Weight: 20
       Commands:
         - "cc give physical %player% Mythic 1"
-      Items:
-        - "Item:tripwire_hook, Amount:1"
   # End of prizes.

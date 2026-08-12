@@ -1,0 +1,87 @@
+pages:
+  page1:
+    items:
+      '1':
+        material: APPLE
+        buy: 3.5
+        sell: 0.88
+      '2':
+        material: BREAD
+        buy: 5.51
+        sell: 1.38
+      '3':
+        material: CAKE
+        buy: 27.76
+        sell: 6.94
+      '4':
+        material: COOKED_SALMON
+        buy: 2.2
+        sell: 0.55
+      '5':
+        material: COOKIE
+        buy: 0.73
+        sell: 0.19
+      '6':
+        material: GLISTERING_MELON_SLICE
+        buy: 2.8
+        sell: 0.7
+      '7':
+        material: GLOW_BERRIES
+        buy: 0.35
+        sell: 0.09
+      '8':
+        material: GOLDEN_CARROT
+        buy: 4.27
+        sell: 1.07
+      '9':
+        material: HONEY_BOTTLE
+        buy: 2.78
+        sell: 0.7
+      '10':
+        material: BAKED_POTATO
+        buy: 1.84
+        sell: 0.46
+      '11':
+        material: COOKED_BEEF
+        buy: 2.2
+        sell: 0.55
+      '12':
+        material: COOKED_CHICKEN
+        buy: 2.2
+        sell: 0.55
+      '13':
+        material: COOKED_MUTTON
+        buy: 2.2
+        sell: 0.55
+      '14':
+        material: COOKED_PORKCHOP
+        buy: 2.2
+        sell: 0.55
+      '15':
+        material: COOKED_RABBIT
+        buy: 2.2
+        sell: 0.55
+      '16':
+        material: BEEF
+        buy: 2.1
+        sell: 0.52
+      '17':
+        material: CHICKEN
+        buy: 2.1
+        sell: 0.52
+      '18':
+        material: MUTTON
+        buy: 2.1
+        sell: 0.52
+      '19':
+        material: PORKCHOP
+        buy: 2.1
+        sell: 0.52
+      '20':
+        material: RABBIT
+        buy: 2.1
+        sell: 0.52
+      '21':
+        material: BEETROOT_SOUP
+        buy: 13.55
+        sell: 3.39

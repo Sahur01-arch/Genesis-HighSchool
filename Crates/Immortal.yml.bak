@@ -16,11 +16,11 @@ Crate:
   # If the type is QuickCrate/CrateOnTheGo/FireCracker, They will not work as they require a Physical Crate.
   InGUI: true
   # Slot the item is in the GUI.
-  Slot: 12
+  Slot: 13
   # Enables/Disables the Broadcasts message when they open a crate.
   OpeningBroadCast: true
   # Message that is broadcast when opening the crate.
-  BroadCast: "%prefix%<bold><gold>%player%</gold></bold><reset> <gray>is opening a <bold><color:#B266FF>Epic Crate.</color></bold>"
+  BroadCast: "%prefix%<bold><gold>%player%</gold></bold><reset> <gray>is opening a <bold><color:#FF4040>Immortal Crate.</color></bold>"
   # This section is related to commands opening when a crate is opened.
   opening-command:
     # If the commands should be sent or not.
@@ -107,16 +107,16 @@ Crate:
   # If the crate in the main /cc GUI is glowing or not.
   Glowing: false
   # Name of the item in the GUI.
-  Name: "<bold><color:#B266FF>Epic Crate</color></bold>"
+  Name: "<bold><color:#FF4040>Immortal Crate</color></bold>"
   # The lore of the item in the GUI.
   Lore:
-    - "<gray><gray>Rewards for the Epic tier."
+    - "<gray><gray>Rewards for the Immortal tier."
     - "<gray>You have <gold>%keys% keys <gray>to open this crate with."
     - "<gray>You have opened this crate: <gold>%crate_opened% times"
     - "<gray>(<yellow>!<gray>) Right click to view rewards."
   Preview:
     # The name of the inventory for the preview menu.
-    Name: "<color:#B266FF>Epic Crate Preview</color>"
+    Name: "<color:#FF4040>Immortal Crate Preview</color>"
     # Turn on and off the preview for this crate.
     Toggle: true
     # How many rows should the preview be? You can use 1-6.
@@ -140,7 +140,7 @@ Crate:
         Id: ""
   PhysicalKey:
     # Name of the Key.
-    Name: "<bold><color:#B266FF>Epic Crate Key</color></bold>"
+    Name: "<bold><color:#FF4040>Immortal Crate Key</color></bold>"
     # Lore of the Key.
     Lore:
       - "<gray>A special Key"
@@ -174,14 +174,14 @@ Crate:
     # The message that will be displayed above the crate.
     # Note: MiniMessage or Color Codes being supported is depending on the 'holograms' plugin.
     Message:
-      - "&#B266FF&lEpic Crate"
+      - "&#FF4040&lImmortal Crate"
   # All the prizes that can be obtained in the Crate.
   # This is a slightly more advanced version. If you want simple!
   # See the CrateExample.yml for a more simple crate.
   Prizes:
     "1":
-      DisplayName: "Money Pouch"
-      DisplayItem: "gold_ingot"
+      DisplayName: "Money Jackpot"
+      DisplayItem: "netherite_block"
       Settings:
         Custom-Model-Data: -1
         Model:
@@ -191,13 +191,15 @@ Crate:
         []
       DisplayAmount: 1
       DisplayLore:
-        - "<gray>Receive <green>$5,000"
-      Weight: 18
+        - "<gray>Receive <green>$100,000"
+      Weight: 20
       Commands:
-        - "eco give %player% 5000"
+        - "eco give %player% 100000"
+      Items:
+        - "Item:netherite_block, Amount:1"
     "2":
-      DisplayName: "Diamond Bundle"
-      DisplayItem: "diamond"
+      DisplayName: "Netherite Ingots"
+      DisplayItem: "netherite_ingot"
       Settings:
         Custom-Model-Data: -1
         Model:
@@ -207,90 +209,77 @@ Crate:
         []
       DisplayAmount: 8
       DisplayLore:
-        - "<gray>8x Diamond"
+        - "<gray>8x Netherite Ingot"
+      Weight: 16
+      Commands:
+        []
+      Items:
+        - "Item:netherite_ingot, Amount:8"
+    "3":
+      DisplayName: "Full Netherite Armor Set"
+      DisplayItem: "netherite_chestplate"
+      Settings:
+        Custom-Model-Data: -1
+        Model:
+          Namespace: ""
+          Id: ""
+      DisplayEnchantments:
+        - "protection:4"
+        - "unbreaking:3"
+        - "mending:1"
+        - "thorns:3"
+      DisplayAmount: 1
+      DisplayLore:
+        - "<gray>Full Set • Protection IV"
+        - "<gray>Unbreaking III • Mending • Thorns III"
       Weight: 14
       Commands:
         []
       Items:
-        - "Item:diamond, Amount:8"
-    "3":
-      DisplayName: "Emerald Bundle"
-      DisplayItem: "emerald"
-      Settings:
-        Custom-Model-Data: -1
-        Model:
-          Namespace: ""
-          Id: ""
-      DisplayEnchantments:
-        []
-      DisplayAmount: 16
-      DisplayLore:
-        - "<gray>16x Emerald"
-      Weight: 10
-      Commands:
-        []
-      Items:
-        - "Item:emerald, Amount:16"
+        - "Item:netherite_helmet, Amount:1, protection:4, unbreaking:3, mending:1, thorns:3"
+        - "Item:netherite_chestplate, Amount:1, protection:4, unbreaking:3, mending:1, thorns:3"
+        - "Item:netherite_leggings, Amount:1, protection:4, unbreaking:3, mending:1, thorns:3"
+        - "Item:netherite_boots, Amount:1, protection:4, unbreaking:3, mending:1, thorns:3"
     "4":
-      DisplayName: "Enchanted Golden Apple"
-      DisplayItem: "enchanted_golden_apple"
+      DisplayName: "Elytra"
+      DisplayItem: "elytra"
       Settings:
         Custom-Model-Data: -1
         Model:
           Namespace: ""
           Id: ""
       DisplayEnchantments:
-        []
-      DisplayAmount: 2
-      DisplayLore:
-        - "<gray>2x Enchanted Golden Apple"
-      Weight: 12
-      Commands:
-        []
-      Items:
-        - "Item:enchanted_golden_apple, Amount:2"
-    "5":
-      DisplayName: "Diamond Pickaxe"
-      DisplayItem: "diamond_pickaxe"
-      Settings:
-        Custom-Model-Data: -1
-        Model:
-          Namespace: ""
-          Id: ""
-      DisplayEnchantments:
-        - "efficiency:3"
         - "unbreaking:3"
         - "mending:1"
       DisplayAmount: 1
       DisplayLore:
-        - "<gray>Efficiency III • Unbreaking III"
-        - "<gray>Mending"
+        - "<gray>Unbreaking III • Mending"
+      Weight: 10
+      Commands:
+        []
+      Items:
+        - "Item:elytra, Amount:1, unbreaking:3, mending:1"
+    "5":
+      DisplayName: "Totem of Undying"
+      DisplayItem: "totem_of_undying"
+      Settings:
+        Custom-Model-Data: -1
+        Model:
+          Namespace: ""
+          Id: ""
+      DisplayEnchantments:
+        []
+      DisplayAmount: 3
+      DisplayLore:
+        - "<gray>3x Totem of Undying"
       Weight: 12
       Commands:
         []
       Items:
-        - "Item:diamond_pickaxe, Amount:1, efficiency:3, unbreaking:3, mending:1"
+        - "Item:totem_of_undying, Amount:3"
     "6":
-      DisplayName: "Mending Book"
-      DisplayItem: "enchanted_book"
-      Settings:
-        Custom-Model-Data: -1
-        Model:
-          Namespace: ""
-          Id: ""
-      DisplayEnchantments:
-        - "mending:1"
-      DisplayAmount: 1
-      DisplayLore:
-        - "<gray>Mending Enchanted Book"
-      Weight: 12
-      Commands:
-        []
-      Items:
-        - "Item:enchanted_book, mending:1"
-    "7":
-      DisplayName: "Shulker Box"
-      DisplayItem: "shulker_box"
+      DisplayName: "Beacon"
+      DisplayItem: "beacon"
       Settings:
         Custom-Model-Data: -1
         Model:
@@ -300,15 +289,33 @@ Crate:
         []
       DisplayAmount: 1
       DisplayLore:
-        - "<gray>1x Shulker Box"
+        - "<gray>1x Beacon"
       Weight: 8
       Commands:
         []
       Items:
-        - "Item:shulker_box, Amount:1"
+        - "Item:beacon, Amount:1"
+    "7":
+      DisplayName: "Netherite Upgrade Templates"
+      DisplayItem: "netherite_upgrade_smithing_template"
+      Settings:
+        Custom-Model-Data: -1
+        Model:
+          Namespace: ""
+          Id: ""
+      DisplayEnchantments:
+        []
+      DisplayAmount: 4
+      DisplayLore:
+        - "<gray>4x Netherite Upgrade Template"
+      Weight: 10
+      Commands:
+        []
+      Items:
+        - "Item:netherite_upgrade_smithing_template, Amount:4"
     "8":
-      DisplayName: "Legend Key"
-      DisplayItem: "tripwire_hook"
+      DisplayName: "Exclusive Reward"
+      DisplayItem: "dragon_egg"
       Settings:
         Custom-Model-Data: -1
         Model:
@@ -318,8 +325,11 @@ Crate:
         []
       DisplayAmount: 1
       DisplayLore:
-        - "<gray>1x Legend Crate Key"
-      Weight: 14
+        - "<gray>Special collectible reward"
+        - "<gray>Replace this with your custom item"
+      Weight: 10
       Commands:
-        - "cc give physical %player% Legend 1"
+        []
+      Items:
+        - "Item:dragon_egg, Amount:1, Name:<bold><color:#FF4040>Immortal Relic</color></bold>"
   # End of prizes.

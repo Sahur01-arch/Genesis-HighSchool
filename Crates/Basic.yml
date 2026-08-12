@@ -16,7 +16,7 @@ Crate:
   # If the type is QuickCrate/CrateOnTheGo/FireCracker, They will not work as they require a Physical Crate.
   InGUI: true
   # Slot the item is in the GUI.
-  Slot: 13
+  Slot: 10
   # Enables/Disables the Broadcasts message when they open a crate.
   OpeningBroadCast: true
   # Message that is broadcast when opening the crate.
@@ -215,8 +215,6 @@ Crate:
       Weight: 20
       Commands:
         - "eco give %player% 250"
-      Items:
-        - "Item:gold_nugget, Amount:1"
     "3":
       DisplayName: "Paket Alat Besi"
       DisplayItem: "iron_pickaxe"
@@ -307,6 +305,4 @@ Crate:
       Weight: 8
       Commands:
         - "cc give physical %player% Normal 1"
-      Items:
-        - "Item:tripwire_hook, Amount:1"
   # End of prizes.

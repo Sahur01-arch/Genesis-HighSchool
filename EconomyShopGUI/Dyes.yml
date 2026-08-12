@@ -1,0 +1,131 @@
+pages:
+  page1:
+    items:
+      '1':
+        material: BLACK_DYE
+        buy: 1.84
+        sell: 0.46
+      '2':
+        material: BLUE_DYE
+        buy: 0.37
+        sell: 0.09
+      '3':
+        material: BROWN_DYE
+        buy: 2.2
+        sell: 0.55
+      '4':
+        material: CYAN_DYE
+        buy: 0.21
+        sell: 0.06
+      '5':
+        material: GRAY_DYE
+        buy: 1.27
+        sell: 0.32
+      '6':
+        material: GREEN_DYE
+        buy: 0.04
+        sell: 0.01
+      '7':
+        material: LIGHT_BLUE_DYE
+        buy: 0.37
+        sell: 0.09
+      '8':
+        material: LIGHT_GRAY_DYE
+        buy: 0.37
+        sell: 0.09
+      '9':
+        material: LIME_DYE
+        buy: 2.2
+        sell: 0.3
+      '10':
+        material: MAGENTA_DYE
+        buy: 0.37
+        sell: 0.09
+      '11':
+        material: ORANGE_DYE
+        buy: 0.37
+        sell: 0.09
+      '12':
+        material: PINK_DYE
+        buy: 0.37
+        sell: 0.09
+      '13':
+        material: PURPLE_DYE
+        buy: 0.39
+        sell: 0.1
+      '14':
+        material: RED_DYE
+        buy: 0.37
+        sell: 0.09
+      '15':
+        material: WHITE_DYE
+        buy: 0.57
+        sell: 0.14
+      '16':
+        material: YELLOW_DYE
+        buy: 0.24
+        sell: 0.06
+      '17':
+        material: AZURE_BLUET
+        buy: 0.35
+        sell: 0.09
+      '18':
+        material: BLUE_ORCHID
+        buy: 0.35
+        sell: 0.09
+      '19':
+        material: CORNFLOWER
+        buy: 0.35
+        sell: 0.09
+      '20':
+        material: LILAC
+        buy: 0.35
+        sell: 0.09
+      '21':
+        material: LILY_OF_THE_VALLEY
+        buy: 0.35
+        sell: 0.09
+      '22':
+        material: ORANGE_TULIP
+        buy: 0.35
+        sell: 0.09
+      '23':
+        material: OXEYE_DAISY
+        buy: 0.35
+        sell: 0.09
+      '24':
+        material: PEONY
+        buy: 0.35
+        sell: 0.09
+      '25':
+        material: PINK_PETALS
+        buy: 0.35
+        sell: 0.09
+      '26':
+        material: PINK_TULIP
+        buy: 0.35
+        sell: 0.09
+      '27':
+        material: PITCHER_PLANT
+        buy: 7.26
+        sell: 1.82
+      '28':
+        material: POPPY
+        buy: 0.35
+        sell: 0.09
+      '29':
+        material: RED_TULIP
+        buy: 0.35
+        sell: 0.09
+      '30':
+        material: SUNFLOWER
+        buy: 0.35
+        sell: 0.09
+      '31':
+        material: TORCHFLOWER
+        buy: 7.26
+        sell: 1.82
+      '32':
+        material: INK_SAC
+        buy: 1.75
+        sell: 0.44
