@@ -10,26 +10,17 @@ header-footer:
         - "Test footer in world 'test'"
     default:
       header:
-        - ""
-        - "<#008B8B>&m                                                "
-        - ""
-        - "      <#FFD700>✦ %animation:logo% <#FFD700>✦      "
-        - "    <#008B8B>Selamat datang, <#FFD700>%player%<#008B8B>!    "
-        - ""
-        - "<#008B8B>⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯"
+        - "<#001636>&m                                            &r"
+        - "<gradient:#001636:#FFD700><bold>✦ GENESIS HIGHSCHOOL ✦</bold></gradient>"
+        - "&7Selamat datang, <gradient:#001636:#FFD700>%player%</gradient>&7!"
+        - "&7● Online <#FFD700>%online% &8| &7● Staff <#FFD700>%staffonline% &8| &7● <#FFD700>%time%"
         - ""
       footer:
         - ""
-        - "<#008B8B>⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯"
-        - ""
-        - " <#008B8B>Players: <#FFD700>%online%  <#008B8B>|  Staff: <#FFD700>%staffonline% "
-        - " <#008B8B>Ping: <#FFD700>%ping%ms  <#008B8B>|  TPS: <#FFD700>%tps% "
-        - " <#008B8B>Jam: <#FFD700>%time% "
-        - ""
-        - " <#FFD700>&lbasic2.raehost.com:19198 "
-        - ""
-        - "<#008B8B>&m                                                "
-        - ""
+        - "<gradient:#001636:#FFD700><bold>Server Info</bold></gradient>"
+        - "&8▸ &7Ping <#FFD700>%ping%ms &8• &7Memory <#FFD700>%memory-used%&7/%memory-max% MB"
+        - "&8▸ &7TPS <#FFD700>%tps% &8• &7IP <#FFD700>basic2.raehost.com:19198"
+        - "&r%animation:ucapan%"
 
 # https://github.com/NEZNAMY/TAB/wiki/Feature-guide:-Tablist-name-formatting
 tablist-name-formatting:
@@ -43,7 +34,7 @@ scoreboard-teams:
   invisible-nametags: false
   # https://github.com/NEZNAMY/TAB/wiki/Feature-guide:-Sorting-players-in-tablist
   sorting-types:
-    - "GROUPS:owner,admin,dev,kepsek,guru,helper,vip,vipplus,epic,legend,mvp,media,dkv,jurusan_build,jurusan_redstone,default"
+    - "GROUPS:owner,dev,admin,helper,kepsek,guru,vip,vipplus,epic,legend,mvp,jurusan_redstone,dkv,jurusan_build,default"
     - "PLACEHOLDER_A_TO_Z:%player%"
   case-sensitive-sorting: true
   can-see-friendly-invisibles: false
@@ -53,7 +44,7 @@ scoreboard-teams:
 playerlist-objective:
   enabled: true
   value: "%ping%"
-  fancy-value: "&7Ping: <#FFD700>%ping%"
+  fancy-value: "&7Ping: %ping%"
   title: "TAB" # Only visible on Bedrock Edition
   render-type: INTEGER
   disable-condition: '%world%=disabledworld'
@@ -93,38 +84,42 @@ scoreboard:
   delay-on-join-milliseconds: 0
   scoreboards:
     scoreboard-1.20.3+:
-      title: "%animation:logo%"
+      title: "<gradient:#001636:#FFD700><bold>✦ GENESIS HIGHSCHOOL ✦</bold></gradient>"
       display-condition: "%player-version-id%>=765;%bedrock%=false"
       lines:
-        - " <#008B8B>⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ "
-        - "  <#FFD700>✦ <#008B8B>&lPROFILE "
-        - "   <#008B8B>▪ <#FFFFFF>Name <#008B8B>» <#FFD700>%player%"
-        - "   <#008B8B>▪ <#FFFFFF>Rank <#008B8B>» <#FFD700>%luckperms-prefix%"
-        - "   <#008B8B>▪ <#FFFFFF>Coin <#008B8B>» <#FFD700>%vault_eco_balance% ⛃"
+        - "<#001636>⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯"
+        - "&7%date% <#FFD700>• &7%time%"
         - ""
-        - "  <#FFD700>✦ <#008B8B>&lSERVER "
-        - "   <#008B8B>▪ <#FFFFFF>Online <#008B8B>» <#FFD700>%online%"
-        - "   <#008B8B>▪ <#FFFFFF>Staff <#008B8B>» <#FFD700>%staffonline%"
-        - "   <#008B8B>▪ <#FFFFFF>Ping <#008B8B>» <#FFD700>%ping%<#FFFFFF>ms"
-        - "   <#008B8B>▪ <#FFFFFF>TPS <#008B8B>» <#FFD700>%tps%"
-        - "   <#008B8B>▪ <#FFFFFF>Waktu <#008B8B>» <#FFD700>%time%"
-        - " <#008B8B>⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ "
+        - "<gradient:#001636:#FFD700><bold>PROFILE</bold></gradient>"
+        - "&8▸ &7Name  <#FFFFFF>%player%"
+        - "&8▸ &7Rank  %luckperms-prefix%"
+        - "&8▸ &7Coin  <#FFD700>%vault_eco_balance% &7Rp"
+        - "&8▸ &7Ping  <#001636>%ping%&7ms"
+        - ""
+        - "<gradient:#001636:#FFD700><bold>SERVER</bold></gradient>"
+        - "&8▸ &7Online  &a%online%"
+        - "&8▸ &7Staff   <#FFD700>%staffonline%"
+        - "&8▸ &7TPS     %tps%"
+        - "&8▸ &7PvP     &4OFF"
+        - "<#001636>⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯"
     scoreboard:
-      title: "%animation:logo%"
+      title: "<gradient:#001636:#FFD700><bold>✦ GENESIS HIGHSCHOOL ✦</bold></gradient>"
       lines:
-        - " <#008B8B>⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ "
-        - "  <#FFD700>✦ <#008B8B>&lPROFILE "
-        - "   <#008B8B>▪ <#FFFFFF>Name <#008B8B>» <#FFD700>%player%"
-        - "   <#008B8B>▪ <#FFFFFF>Rank <#008B8B>» <#FFD700>%luckperms-prefix%"
-        - "   <#008B8B>▪ <#FFFFFF>Coin <#008B8B>» <#FFD700>%vault_eco_balance% ⛃"
+        - "<#001636>⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯"
+        - "&7%date% <#FFD700>• &7%time%"
         - ""
-        - "  <#FFD700>✦ <#008B8B>&lSERVER "
-        - "   <#008B8B>▪ <#FFFFFF>Online <#008B8B>» <#FFD700>%online%"
-        - "   <#008B8B>▪ <#FFFFFF>Staff <#008B8B>» <#FFD700>%staffonline%"
-        - "   <#008B8B>▪ <#FFFFFF>Ping <#008B8B>» <#FFD700>%ping%<#FFFFFF>ms"
-        - "   <#008B8B>▪ <#FFFFFF>TPS <#008B8B>» <#FFD700>%tps%"
-        - "   <#008B8B>▪ <#FFFFFF>Waktu <#008B8B>» <#FFD700>%time%"
-        - " <#008B8B>⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ "
+        - "<gradient:#001636:#FFD700><bold>PROFILE</bold></gradient>"
+        - "&8▸ &7Name  <#FFFFFF>%player%"
+        - "&8▸ &7Rank  %luckperms-prefix%"
+        - "&8▸ &7Coin  <#FFD700>%vault_eco_balance% &7Rp"
+        - "&8▸ &7Ping  <#001636>%ping%&7ms"
+        - ""
+        - "<gradient:#001636:#FFD700><bold>SERVER</bold></gradient>"
+        - "&8▸ &7Online  &a%online%"
+        - "&8▸ &7Staff   <#FFD700>%staffonline%"
+        - "&8▸ &7TPS     %tps%"
+        - "&8▸ &7PvP     &4OFF"
+        - "<#001636>⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯"
 
 # https://github.com/NEZNAMY/TAB/wiki/Feature-guide:-Layout
 layout:
@@ -189,7 +184,7 @@ global-playerlist:
 
 placeholders:
   date-format: "dd/MM/yy"
-  time-format: "[HH:mm:ss]"
+  time-format: "HH:mm"
   time-offset: 0
   register-tab-expansion: false
   locale: en-US
@@ -255,6 +250,8 @@ proxy-support:
   # Supported types: PLUGIN, REDIS, RABBITMQ
   type: PLUGIN
   plugin:
+    # Compatible plugins: RedisBungee
+    # If enabled and compatible plugin is found, hook is enabled to work with proxied players
     name: RedisBungee
   redis:
     url: 'redis://:password@localhost:6379/0'
@@ -273,9 +270,12 @@ config-version: 6
 # BUKKIT ONLY - THE FOLLOWING SECTION IS ONLY FOR BACKEND INSTALLATION #
 ########################################################################
 
+# https://github.com/NEZNAMY/TAB/wiki/Feature-guide:-Per-world-playerlist
 per-world-playerlist:
   enabled: false
+  # players with tab.staff will always see all players
   allow-bypass-permission: false
+  # players in these worlds will always see all players
   ignore-effect-in-worlds:
     - ignoredworld
     - build
@@ -293,5 +293,10 @@ compensate-for-packetevents-bug: false
 # PROXY ONLY - THE FOLLOWING SECTION IS ONLY FOR PROXY INSTALLATION #
 #####################################################################
 
+# Take permissions and groups from backend server instead of proxy
 use-bukkit-permissions-manager: false
+
+# Sometimes server might be using offline uuids in tablist instead of online, such as disabling waterfall's tablist rewrite option
+# If you experience tablist formatting not working, toggle this option (set it to opposite value)
+# Only affects proxies with online mode enabled
 use-online-uuid-in-tablist: true
