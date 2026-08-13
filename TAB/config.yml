@@ -10,14 +10,14 @@ header-footer:
         - "Test footer in world 'test'"
     default:
       header:
-        - "<#001636>&m                                            &r"
-        - "<gradient:#001636:#FFD700><bold>✦ GENESIS HIGHSCHOOL ✦</bold></gradient>"
-        - "&7Selamat datang, <gradient:#001636:#FFD700>%player%</gradient>&7!"
+        - "<#004AAB>&m                                            &r"
+        - "<gradient:#004AAB:#FFD700><bold>✦ GENESIS HIGHSCHOOL ✦</bold></gradient>"
+        - "&7Selamat datang, <gradient:#004AAB:#FFD700>%player%</gradient>&7!"
         - "&7● Online <#FFD700>%online% &8| &7● Staff <#FFD700>%staffonline% &8| &7● <#FFD700>%time%"
         - ""
       footer:
         - ""
-        - "<gradient:#001636:#FFD700><bold>Server Info</bold></gradient>"
+        - "<gradient:#004AAB:#FFD700><bold>Server Info</bold></gradient>"
         - "&8▸ &7Ping <#FFD700>%ping%ms &8• &7Memory <#FFD700>%memory-used%&7/%memory-max% MB"
         - "&8▸ &7TPS <#FFD700>%tps% &8• &7IP <#FFD700>basic2.raehost.com:19198"
         - "&r%animation:ucapan%"
@@ -84,42 +84,42 @@ scoreboard:
   delay-on-join-milliseconds: 0
   scoreboards:
     scoreboard-1.20.3+:
-      title: "<gradient:#001636:#FFD700><bold>✦ GENESIS HIGHSCHOOL ✦</bold></gradient>"
+      title: "<gradient:#004AAB:#FFD700><bold>✦ GENESIS HIGHSCHOOL ✦</bold></gradient>"
       display-condition: "%player-version-id%>=765;%bedrock%=false"
       lines:
-        - "<#001636>⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯"
+        - "<#004AAB>⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯"
         - "&7%date% <#FFD700>• &7%time%"
         - ""
-        - "<gradient:#001636:#FFD700><bold>PROFILE</bold></gradient>"
+        - "<gradient:#004AAB:#FFD700><bold>PROFILE</bold></gradient>"
         - "&8▸ &7Name  <#FFFFFF>%player%"
         - "&8▸ &7Rank  %luckperms-prefix%"
         - "&8▸ &7Coin  <#FFD700>%vault_eco_balance% &7Rp"
-        - "&8▸ &7Ping  <#001636>%ping%&7ms"
+        - "&8▸ &7Ping  <#004AAB>%ping%&7ms"
         - ""
-        - "<gradient:#001636:#FFD700><bold>SERVER</bold></gradient>"
+        - "<gradient:#004AAB:#FFD700><bold>SERVER</bold></gradient>"
         - "&8▸ &7Online  &a%online%"
         - "&8▸ &7Staff   <#FFD700>%staffonline%"
         - "&8▸ &7TPS     %tps%"
         - "&8▸ &7PvP     &4OFF"
-        - "<#001636>⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯"
+        - "<#004AAB>⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯"
     scoreboard:
-      title: "<gradient:#001636:#FFD700><bold>✦ GENESIS HIGHSCHOOL ✦</bold></gradient>"
+      title: "<gradient:#004AAB:#FFD700><bold>✦ GENESIS HIGHSCHOOL ✦</bold></gradient>"
       lines:
-        - "<#001636>⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯"
+        - "<#004AAB>⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯"
         - "&7%date% <#FFD700>• &7%time%"
         - ""
-        - "<gradient:#001636:#FFD700><bold>PROFILE</bold></gradient>"
+        - "<gradient:#004AAB:#FFD700><bold>PROFILE</bold></gradient>"
         - "&8▸ &7Name  <#FFFFFF>%player%"
         - "&8▸ &7Rank  %luckperms-prefix%"
         - "&8▸ &7Coin  <#FFD700>%vault_eco_balance% &7Rp"
-        - "&8▸ &7Ping  <#001636>%ping%&7ms"
+        - "&8▸ &7Ping  <#004AAB>%ping%&7ms"
         - ""
-        - "<gradient:#001636:#FFD700><bold>SERVER</bold></gradient>"
+        - "<gradient:#004AAB:#FFD700><bold>SERVER</bold></gradient>"
         - "&8▸ &7Online  &a%online%"
         - "&8▸ &7Staff   <#FFD700>%staffonline%"
         - "&8▸ &7TPS     %tps%"
         - "&8▸ &7PvP     &4OFF"
-        - "<#001636>⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯"
+        - "<#004AAB>⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯"
 
 # https://github.com/NEZNAMY/TAB/wiki/Feature-guide:-Layout
 layout:
@@ -300,3 +300,4 @@ use-bukkit-permissions-manager: false
 # If you experience tablist formatting not working, toggle this option (set it to opposite value)
 # Only affects proxies with online mode enabled
 use-online-uuid-in-tablist: true
+
