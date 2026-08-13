@@ -35,12 +35,16 @@ var KELAS_LIST = [
 ];
 
 function pindahKelas(player, kelasBaru) {
-    var kelasSekarang = Kelas.ambilKelasSiswa(player.getUniqueId().toString());
+    // 🎯 FIX: Validasi Super Ketat via Native Bukkit Permission
+    // LuckPerms otomatis memberikan permission "group.<nama>" ke setiap anggotanya.
+    var sudahPunyaJurusan = false;
 
-    // 🎯 FIX: Cek apakah kelasSekarang COCOK dengan salah satu groupLP di KELAS_LIST
-    var sudahPunyaJurusan = KELAS_LIST.some(function(k) {
-        return k.groupLP === kelasSekarang;
-    });
+    for (var i = 0; i < KELAS_LIST.length; i++) {
+        if (player.hasPermission("group." + KELAS_LIST[i].groupLP)) {
+            sudahPunyaJurusan = true;
+            break;
+        }
+    }
 
     // Jika pemain sudah punya salah satu jurusan dari KELAS_LIST, batalkan
     if (sudahPunyaJurusan) {
@@ -55,10 +59,13 @@ function pindahKelas(player, kelasBaru) {
         return false;
     }
 
-    // Jika belum punya jurusan (misal hanya memegang grup 'default'), tambahkan grup jurusan baru
+    // Jika belum punya jurusan, tambahkan grup jurusan baru
     task.main(function() {
         var console = Bukkit.getConsoleSender();
         Bukkit.dispatchCommand(console, "lp user " + player.getName() + " parent add " + kelasBaru.groupLP);
+        
+        // Opsional: Jika fungsi setKelasSiswa ada di libkelas, panggil di sini agar tersimpan ke Disk
+        // Kelas.setKelasSiswa(player.getUniqueId().toString(), kelasBaru.groupLP);
     });
 
     return true;
