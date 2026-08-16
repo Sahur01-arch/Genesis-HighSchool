@@ -6,7 +6,7 @@ const LuckPermsProvider = importClass("net.luckperms.api.LuckPermsProvider");
 
 task.waitForPlugin("LuckPerms");
 
-var daftarKelas = ["kelasa", "kelasb", "kelasc", "kelasd"]
+var daftarKelas = ["jurusan_build", "jurusan_redstone", "jurusan_pertanian"]
 
 function addGroup(name, weight) {
   weight = (typeof weight === "number") ? weight : 0;
