@@ -1,6 +1,6 @@
 # 📖 Genesis-HighSchool — Wiki Command Server
 
-> Server: **Genesis** (Purpur 1.21.1) — dulu bernama UNDERCITY
+> Server: **Genesis** (Purpur 26.2)
 > Repo custom feature: https://github.com/Sahur01-arch/Genesis-HighSchool
 > Dokumen ini merangkum **seluruh command** yang tersedia di server: baik command **custom buatan sendiri** (folder `OpenJS/` di repo) maupun command bawaan **46 plugin** yang terpasang (5 Paper Plugins + 41 Bukkit Plugins, sesuai log panel server).
 
