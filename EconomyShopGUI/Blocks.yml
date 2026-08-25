@@ -3,7 +3,7 @@ pages:
     items:
       '1':
         material: CALCITE
-        buy: 0.7
+        buy: 0.9
         sell: 0.15
       '2':
         material: DRIPSTONE_BLOCK
