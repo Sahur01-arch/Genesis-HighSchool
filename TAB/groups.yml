@@ -1,0 +1,36 @@
+# default settings for all groups, all groups will take properties from this section
+# unless they have their own entry below overriding it
+_DEFAULT_:
+  tabprefix: "%luckperms_prefix%"
+  tagprefix: "%luckperms_prefix%"
+  customtabname: "%player%"
+  tabsuffix: "%luckperms_suffix%"
+  tagsuffix: "%luckperms_suffix%"
+
+_OTHER_:
+  tabprefix: "%luckperms_prefix% "
+  tagprefix: "%luckperms_prefix% "
+
+dkv:
+  tabprefix: "%luckperms_prefix% %luckperms_meta_jurusan% "
+  tagprefix: "%luckperms_prefix% %luckperms_meta_jurusan% "
+
+jurusan_build:
+  tabprefix: "%luckperms_prefix% &b[%luckperms_meta_jurusan%] "
+  tagprefix: "%luckperms_prefix% &b[%luckperms_meta_jurusan%] "
+
+jurusan_redstone:
+  tabprefix: "%luckperms_prefix% &c[%luckperms_meta_jurusan%] "
+  tagprefix: "%luckperms_prefix% &c[%luckperms_meta_jurusan%] "
+
+jurusan_pertanian:
+  tabprefix: "%luckperms_prefix% &e[%luckperms_meta_jurusan%] "
+  tagprefix: "%luckperms_prefix% &e[%luckperms_meta_jurusan%] "
+
+default:
+  tabprefix: "%luckperms_prefix% &7[%luckperms_meta_jurusan%] "
+  tagprefix: "&7[%luckperms_meta_jurusan%] "
+
+dev:
+  tabprefix: "%luckperms_prefix% "
+  tagprefix: "%luckperms_prefix% "

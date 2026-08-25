@@ -1,0 +1,329 @@
+Crate:
+  # https://docs.crazycrew.us/docs/plugins/crazycrates/misc/crate-types
+
+  # Make sure to check out the wiki for anything not explained here.
+  # https://docs.crazycrew.us/docs/category/crazycrates
+
+  # See CosmicCrate.yml or CasinoCrate.yml to see how the Cosmic/Casino CrateType works.
+  CrateType: CSGO
+  # Starting amount of keys when the player 1st joins.
+  StartingKeys: 0
+  # The amount of keys required to use the crate.
+  RequiredKeys: 1
+  # Max amount of crates that can be opened at once using /crates mass-open
+  Max-Mass-Open: 10
+  # If the crate shows in /crates.
+  # If the type is QuickCrate/CrateOnTheGo/FireCracker, They will not work as they require a Physical Crate.
+  InGUI: true
+  # Slot the item is in the GUI.
+  Slot: 13
+  # Enables/Disables the Broadcasts message when they open a crate.
+  OpeningBroadCast: true
+  # Message that is broadcast when opening the crate.
+  BroadCast: "%prefix%<bold><gold>%player%</gold></bold><reset> <gray>is opening a <bold><color:#B266FF>Epic Crate.</color></bold>"
+  # This section is related to commands opening when a crate is opened.
+  opening-command:
+    # If the commands should be sent or not.
+    toggle: false
+    # The commands to run when the crate opens.
+    # Supports all placeholderapi placeholders
+    # Supports %prefix which returns our prefix, %player% which uses the player name
+    commands:
+      - "put your command here."
+  sound:
+    # The sound options when the animation is cycling.
+    cycle-sound:
+      # If sound should be enabled or not.
+      toggle: true
+      # The type of sound to use. Custom sounds from texture packs are supported!
+      # https://minecraft.wiki/w/Sounds.json#Java_Edition_values
+      value: "block.note_block.xylophone"
+      # The volume of the pitch.
+      volume: 1.0
+      # The speed of the sound.
+      pitch: 1.0
+    # The sound options when an item is clicked.
+    click-sound:
+      # If sound should be enabled or not.
+      toggle: true
+      # The type of sound to use. Custom sounds from texture packs are supported!
+      # https://minecraft.wiki/w/Sounds.json#Java_Edition_values
+      value: "ui.button.click"
+      # The volume of the pitch.
+      volume: 1.0
+      # The speed of the sound.
+      pitch: 1.0
+    # The sound options when a crate ends.
+    stop-sound:
+      # If sound should be enabled or not.
+      toggle: true
+      # The type of sound to use. Custom sounds from texture packs are supported!
+      # https://minecraft.wiki/w/Sounds.json#Java_Edition_values
+      value: "entity.player.levelup"
+      # The volume of the pitch.
+      volume: 1.0
+      # The speed of the sound.
+      pitch: 1.0
+  # A default message if the prize doesn't have any Messages
+  # i.e. Messages: [] or the value isn't there.
+  Prize-Message:
+    - "<gray>You have won <red>%reward% <gray>from <red>%crate%."
+  # A list of commands to run by default on every prize.
+  # If you do not want these commands to run, set this to []
+  Prize-Commands: []
+  # Global Settings
+  Settings:
+    # Broadcast a message to the server
+    Broadcast:
+      # If the messages should be sent.
+      Toggle: false
+      # The messages to broadcast.
+      Messages:
+        - "<red>%player% won the prize <yellow>%reward%."
+      # If the player has this permission, they don't get the broadcast.
+      Permission: ""
+    # Settings related to rewards.
+    Rewards:
+      # Should a yes/no popup be made, to ask if they want to keep the prize?
+      Re-Roll-Spin: false
+      # Should there be a limit to how many times they can re-roll?
+      Permission:
+        Toggle: false
+        # This will define how many permissions will be registered to the server per crate.
+        # i.e. crazycrates.respin.crate_name.1-20
+        # It will simply register multiple permissions, so it shows up in things like LuckPerms.
+        Max-Cap: 20
+  # Item the crate is in the GUI
+  Item: "chest"
+  # The custom model data of the item, -1 is disabled.
+  Custom-Model-Data: -1
+  # The item model, Mojang introduced this in 1.21.4... this replaces custom model data!
+  # Set this to blank for it to do nothing.
+  Model:
+    # The namespace i.e. nexo
+    Namespace: ""
+    # The id i.e. emerald_helmet
+    Id: ""
+  # If the crate in the main /cc GUI is glowing or not.
+  Glowing: false
+  # Name of the item in the GUI.
+  Name: "<bold><color:#B266FF>Epic Crate</color></bold>"
+  # The lore of the item in the GUI.
+  Lore:
+    - "<gray><gray>Rewards for the Epic tier."
+    - "<gray>You have <gold>%keys% keys <gray>to open this crate with."
+    - "<gray>You have opened this crate: <gold>%crate_opened% times"
+    - "<gray>(<yellow>!<gray>) Right click to view rewards."
+  Preview:
+    # The name of the inventory for the preview menu.
+    Name: "<color:#B266FF>Epic Crate Preview</color>"
+    # Turn on and off the preview for this crate.
+    Toggle: true
+    # How many rows should the preview be? You can use 1-6.
+    Rows: 6
+    # Settings related to the glass in the preview.
+    Glass:
+      # Turn the glass border in the preview on and off.
+      Toggle: true
+      # The name of the border item.
+      Name: " "
+      # The item that shows in the border. Can be glass or any other item.
+      Item: "gray_stained_glass_pane"
+      # The custom model data of the item, -1 is disabled.
+      Custom-Model-Data: -1
+      # The item model, Mojang introduced this in 1.21.4... this replaces custom model data!
+      # Set this to blank for it to do nothing.
+      Model:
+        # The namespace i.e. nexo
+        Namespace: ""
+        # The id i.e. emerald_helmet
+        Id: ""
+  PhysicalKey:
+    # Name of the Key.
+    Name: "<bold><color:#B266FF>Epic Crate Key</color></bold>"
+    # Lore of the Key.
+    Lore:
+      - "<gray>A special Key"
+      - "<gray>For a special Crate."
+    # The item the key is.
+    Item: "tripwire_hook"
+    # The custom model data of the item, -1 is disabled.
+    Custom-Model-Data: -1
+    # The item model, Mojang introduced this in 1.21.4... this replaces custom model data!
+    # Set this to blank for it to do nothing.
+    Model:
+      # The namespace i.e. nexo
+      Namespace: ""
+      # The id i.e. emerald_helmet
+      Id: ""
+    # Makes the key look enchanted.
+    Glowing: true
+  # Settings for the holograms.
+  Hologram:
+    # Toggle on and off the holograms for the crates.
+    Toggle: true
+    # The height of the hologram above the crate.
+    Height: 1.5
+    # The distance the hologram can be seen.
+    Range: 8
+    # How often should the hologram update? -1 is disabled.
+    Update-Interval: -1
+    # The background color of the hologram. It uses hex colors. This only works with CMI/FancyHolograms
+    # Set the color to transparent if you don't want any color.
+    Color: "transparent"
+    # The message that will be displayed above the crate.
+    # Note: MiniMessage or Color Codes being supported is depending on the 'holograms' plugin.
+    Message:
+      - "&#B266FF&lEpic Crate"
+  # All the prizes that can be obtained in the Crate.
+  # This is a slightly more advanced version. If you want simple!
+  # See the CrateExample.yml for a more simple crate.
+  Prizes:
+    "1":
+      DisplayName: "Money Pouch"
+      DisplayItem: "gold_ingot"
+      Settings:
+        Custom-Model-Data: -1
+        Model:
+          Namespace: ""
+          Id: ""
+      DisplayEnchantments:
+        []
+      DisplayAmount: 1
+      DisplayLore:
+        - "<gray>Receive <green>$5,000"
+      Weight: 18
+      Commands:
+        - "eco give %player% 5000"
+      Items:
+        - "Item:gold_ingot, Amount:1"
+    "2":
+      DisplayName: "Diamond Bundle"
+      DisplayItem: "diamond"
+      Settings:
+        Custom-Model-Data: -1
+        Model:
+          Namespace: ""
+          Id: ""
+      DisplayEnchantments:
+        []
+      DisplayAmount: 8
+      DisplayLore:
+        - "<gray>8x Diamond"
+      Weight: 14
+      Commands:
+        []
+      Items:
+        - "Item:diamond, Amount:8"
+    "3":
+      DisplayName: "Emerald Bundle"
+      DisplayItem: "emerald"
+      Settings:
+        Custom-Model-Data: -1
+        Model:
+          Namespace: ""
+          Id: ""
+      DisplayEnchantments:
+        []
+      DisplayAmount: 16
+      DisplayLore:
+        - "<gray>16x Emerald"
+      Weight: 10
+      Commands:
+        []
+      Items:
+        - "Item:emerald, Amount:16"
+    "4":
+      DisplayName: "Enchanted Golden Apple"
+      DisplayItem: "enchanted_golden_apple"
+      Settings:
+        Custom-Model-Data: -1
+        Model:
+          Namespace: ""
+          Id: ""
+      DisplayEnchantments:
+        []
+      DisplayAmount: 2
+      DisplayLore:
+        - "<gray>2x Enchanted Golden Apple"
+      Weight: 12
+      Commands:
+        []
+      Items:
+        - "Item:enchanted_golden_apple, Amount:2"
+    "5":
+      DisplayName: "Diamond Pickaxe"
+      DisplayItem: "diamond_pickaxe"
+      Settings:
+        Custom-Model-Data: -1
+        Model:
+          Namespace: ""
+          Id: ""
+      DisplayEnchantments:
+        - "efficiency:3"
+        - "unbreaking:3"
+        - "mending:1"
+      DisplayAmount: 1
+      DisplayLore:
+        - "<gray>Efficiency III • Unbreaking III"
+        - "<gray>Mending"
+      Weight: 12
+      Commands:
+        []
+      Items:
+        - "Item:diamond_pickaxe, Amount:1, efficiency:3, unbreaking:3, mending:1"
+    "6":
+      DisplayName: "Mending Book"
+      DisplayItem: "enchanted_book"
+      Settings:
+        Custom-Model-Data: -1
+        Model:
+          Namespace: ""
+          Id: ""
+      DisplayEnchantments:
+        - "mending:1"
+      DisplayAmount: 1
+      DisplayLore:
+        - "<gray>Mending Enchanted Book"
+      Weight: 12
+      Commands:
+        []
+      Items:
+        - "Item:enchanted_book, mending:1"
+    "7":
+      DisplayName: "Shulker Box"
+      DisplayItem: "shulker_box"
+      Settings:
+        Custom-Model-Data: -1
+        Model:
+          Namespace: ""
+          Id: ""
+      DisplayEnchantments:
+        []
+      DisplayAmount: 1
+      DisplayLore:
+        - "<gray>1x Shulker Box"
+      Weight: 8
+      Commands:
+        []
+      Items:
+        - "Item:shulker_box, Amount:1"
+    "8":
+      DisplayName: "Legend Key"
+      DisplayItem: "tripwire_hook"
+      Settings:
+        Custom-Model-Data: -1
+        Model:
+          Namespace: ""
+          Id: ""
+      DisplayEnchantments:
+        []
+      DisplayAmount: 1
+      DisplayLore:
+        - "<gray>1x Legend Crate Key"
+      Weight: 14
+      Commands:
+        - "cc give physical %player% Legend 1"
+      Items:
+        - "Item:tripwire_hook, Amount:1"
+  # End of prizes.
