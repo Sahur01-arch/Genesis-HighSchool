@@ -1,0 +1,66 @@
+settings:
+  menu: 'example-shop-menu'
+  buy-more: true
+  shop-name: '{lang:special-items-shop-name}'
+  hide-message: false
+  secret-shop-items: true
+  allow-favourite: true
+
+items:
+  A:
+    price-mode: CLASSIC_ALL
+    product-mode: CLASSIC_ALL
+    products:
+      1:
+        material: EXPERIENCE_BOTTLE
+        amount: 1
+    buy-prices:
+      1:
+        economy-plugin: Vault
+        amount: '12'
+        placeholder: '{amount}$'
+        start-apply: 0
+    sell-prices:
+      1:
+        economy-plugin: Vault
+        amount: '7'
+        placeholder: '{amount}$'
+        start-apply: 0
+  B:
+    price-mode: CLASSIC_ALL
+    product-mode: CLASSIC_ALL
+    products:
+      1:
+        material: HEART_OF_THE_SEA
+        amount: 1
+    buy-prices:
+      1:
+        economy-plugin: Vault
+        amount: '180'
+        placeholder: '{amount}$'
+        start-apply: 0
+    sell-prices:
+      1:
+        economy-plugin: Vault
+        amount: '110'
+        placeholder: '{amount}$'
+        start-apply: 0
+  C:
+    price-mode: CLASSIC_ALL
+    product-mode: CLASSIC_ALL
+    products:
+      1:
+        material: NAUTILUS_SHELL
+        amount: 1
+    buy-prices:
+      1:
+        economy-plugin: Vault
+        amount: '18'
+        placeholder: '{amount}$'
+        start-apply: 0
+    sell-prices:
+      1:
+        economy-plugin: Vault
+        amount: '11'
+        placeholder: '{amount}$'
+        start-apply: 0

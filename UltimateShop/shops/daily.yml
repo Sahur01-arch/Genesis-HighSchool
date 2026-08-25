@@ -1,0 +1,109 @@
+settings:
+  menu: 'daily-shop-menu'
+  buy-more: true
+  shop-name: '{lang:daily-shop-name}'
+  hide-message: false
+  secret-shop-items: true
+  allow-favourite: false
+
+general-configs:
+  price-mode: CLASSIC_ANY
+  product-mode: CLASSIC_ANY
+  sell-limits:
+    global: 640
+    default: 18
+    vip: 256
+  sell-limits-conditions:
+    vip:
+      1:
+        type: permission
+        permission: 'group.vip'
+  sell-times-reset-mode: 'COOLDOWN_TIMED'
+  sell-times-reset-time: '{random_reset}'
+
+items:
+  A:
+    products:
+      1:
+        material: REDSTONE
+        amount: 1
+    sell-prices:
+      1:
+        economy-plugin: Vault
+        amount: 1
+        placeholder: '&6{amount} Coins'
+        start-apply: 0
+  B:
+    products:
+      1:
+        material: IRON_INGOT
+        amount: 1
+    sell-prices:
+      1:
+        economy-plugin: Vault
+        amount: 3
+        placeholder: '&6{amount} Coins'
+        start-apply: 0
+  C:
+    products:
+      1:
+        material: GOLD_INGOT
+        amount: 1
+    sell-prices:
+      1:
+        economy-plugin: Vault
+        amount: 1.6
+        placeholder: '&6{amount} Coins'
+        start-apply: 0
+  D:
+    products:
+      1:
+        material: COPPER_INGOT
+        amount: 1
+    sell-prices:
+      1:
+        economy-plugin: Vault
+        amount: 2
+        placeholder: '&6{amount} Coins'
+        start-apply: 0
+  E:
+    products:
+      1:
+        material: DIAMOND
+        amount: 1
+    sell-prices:
+      1:
+        economy-plugin: Vault
+        amount: 0.8
+        placeholder: '&6{amount} Coins'
+        start-apply: 0
+  F:
+    products:
+      1:
+        material: LAPIS_LAZULI
+        amount: 1
+      2:
+        material: EMERALD
+        amount: 1
+    sell-prices:
+      1:
+        economy-plugin: Vault
+        amount: 1.2
+        placeholder: '&6{amount} Coins'
+        start-apply: 0
+      2:
+        economy-plugin: Vault
+        amount: 3.3
+        placeholder: '&6{amount} Coins'
+        start-apply: 0
+  G:
+    products:
+      1:
+        material: EMERALD
+        amount: 1
+    sell-prices:
+      1:
+        economy-plugin: Vault
+        amount: 5
+        placeholder: '&6{amount} Coins'
+        start-apply: 0

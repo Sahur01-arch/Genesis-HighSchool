@@ -1,0 +1,474 @@
+# Read plugin wiki before use this plugin.
+# This example file only shows you about 10% common usages of this plugin. This plugin has much powerful features need you unlock by carefully read plugin Wiki!
+
+settings:
+  menu: 'example-shop-menu'
+  menu-settings:
+    conditions:
+      1:
+        type: permission
+        permission: 'test.required'
+  buy-more: true
+  shop-name: 'Example Shop'
+  hide-message: false
+  secret-shop-items: true
+  allow-favourite: false
+
+# General Configs means the section below will work for all products inside this shop.
+general-configs:
+  conditions:
+    10:
+      type: permission
+      permission: 'test.required'
+
+items:
+  #
+  # Potion Example
+  # This item does not include sell price, so it can not be sold.
+  #
+  A:
+    price-mode: CLASSIC_ALL
+    product-mode: CLASSIC_ALL
+    products:
+      1:
+        material: POTION
+        base-effect: STRENGTH, true, false
+        # For 1.20.5+ server:
+        # base-effect: LONG_STRENGTH
+        amount: 1
+    buy-prices:
+      1:
+        material: diamond
+        amount: 60
+        placeholder: 'Diamond x{amount}'
+        start-apply: 0
+  #
+  # Bundle Example
+  #
+  B:
+    price-mode: CLASSIC_ALL
+    product-mode: CLASSIC_ALL
+    products:
+      1:
+        material: bundle
+        contents:
+          1:
+            material: DIAMOND
+            amount: 32
+        amount: 1
+    buy-prices:
+      1:
+        economy-type: levels
+        amount: 60
+        placeholder: '&6{amount} levels'
+        start-apply: 0
+  #
+  # Brushable Sand Example
+  #
+  C:
+    price-mode: CLASSIC_ALL
+    product-mode: CLASSIC_ALL
+    add-lore:
+      - '&fBuy it for now: {buy-price}'
+    products:
+      1:
+        material: suspicious_sand
+        amount: 1
+        name: '&fMagic Sand'
+        lore:
+          - '&fA sand that includes apple!'
+        content:
+          material: APPLE
+    buy-prices:
+      1:
+        economy-type: levels
+        amount: 1
+        placeholder: '&6{amount} levels'
+        start-apply: 0
+  #
+  # Enchanted Item Example
+  #
+  D:
+    price-mode: CLASSIC_ALL
+    product-mode: CLASSIC_ALL
+    products:
+      1:
+        material: DIAMOND_AXE
+        # If you installed MMOItems:
+        # hook-plugin: MMOItems
+        # hook-item: AXE;;EXECUTIONER_AXE
+        # Add more enchants for mmoitems item!
+        enchants:
+          FIRE_ASPECT: 2
+          UNBREAKING: 3
+          COIN_REPAIR: 2 # A EcoEnchants enchantment
+        plugin-enchants:
+          PLANTER: 5
+    buy-prices:
+      1:
+        economy-type: levels
+        amount: 20
+        placeholder: '&6{amount} levels'
+        start-apply: 0
+  #
+  # Enchanting book Example
+  #
+  E:
+    price-mode: CLASSIC_ALL
+    product-mode: CLASSIC_ALL
+    products:
+      1:
+        material: ENCHANTED_BOOK
+        amount: 1
+        stored-enchants:
+          protection: 2
+    buy-prices:
+      1:
+        economy-type: levels
+        amount: 2
+        placeholder: '&6{amount} levels'
+        start-apply: 0
+  #
+  # Conditional Price Product
+  # Seasonal Price Example
+  #
+  F:
+    price-mode: CLASSIC_ALL
+    product-mode: CLASSIC_ALL
+    products:
+      1:
+        material: potato
+        amount: 1
+    buy-prices:
+      1:
+        economy-plugin: Vault
+        amount: 2
+        placeholder: '&6{amount} Coins'
+        conditions:
+          1:
+            type: placeholder
+            placeholder: '%rs_season%'
+            rule: '=='
+            value: 'Spring'
+      2:
+        economy-plugin: Vault
+        amount: 1.8
+        placeholder: '&6{amount} Coins'
+        conditions:
+          1:
+            type: placeholder
+            placeholder: '%rs_season%'
+            rule: '=='
+            value: 'Summber'
+      3:
+        economy-plugin: Vault
+        amount: 3.2
+        placeholder: '&6{amount} Coins'
+        conditions:
+          1:
+            type: placeholder
+            placeholder: '%rs_season%'
+            rule: '=='
+            value: 'Fall'
+      4:
+        economy-plugin: Vault
+        amount: 8.8
+        placeholder: '&6{amount} Coins'
+        conditions:
+          1:
+            type: placeholder
+            placeholder: '%rs_season%'
+            rule: '=='
+            value: 'Winter'
+  #
+  # Banner Example
+  #
+  G:
+    price-mode: CLASSIC_ALL
+    product-mode: CLASSIC_ALL
+    products:
+      1:
+        material: blue_banner
+        patterns:
+          - 'SQUARE_BOTTOM_LEFT: LIGHT_BLUE'
+        amount: 1
+    buy-prices:
+      1:
+        economy-plugin: Vault
+        amount: 60
+        placeholder: '{amount}$'
+        start-apply: 0
+  #
+  # Axolotl Bucket Example
+  #
+  H:
+    price-mode: CLASSIC_ALL
+    product-mode: CLASSIC_ALL
+    products:
+      1:
+        material: AXOLOTL_BUCKET
+        color: WILD
+        amount: 1
+    buy-prices:
+      1:
+        economy-type: exp
+        amount: 60
+        placeholder: '&6{amount} Exps'
+        start-apply: 0
+  #
+  # Tropical Fish Example
+  #
+  I:
+    price-mode: CLASSIC_ALL
+    product-mode: CLASSIC_ALL
+    products:
+      1:
+        material: TROPICAL_FISH_BUCKET
+        amount: 1
+        pattern: KOB
+        pattern-color: ORANGE
+        color: WHITE
+    buy-prices:
+      1:
+        economy-type: exp
+        amount: 50
+        placeholder: '&6{amount} Exps'
+        start-apply: 0
+  #
+  # Player Head Example
+  #
+  J:
+    price-mode: CLASSIC_ALL
+    product-mode: CLASSIC_ALL
+    products:
+      1:
+        material: PLAYER_HEAD
+        amount: 1
+        skull: eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2YzZmVkMTZmZDU1MTkwOWZhNWUyOWNkZDY5N2VlMzQ2ZTYzMzkwYjM4M2E0MzAwYTY2MmE4MGI2NGQ5ZWIxNyJ9fX0=
+    buy-prices:
+      1:
+        economy-type: exp
+        amount: 5
+        placeholder: '&6{amount} Exps'
+        start-apply: 0
+  K:
+    price-mode: CLASSIC_ALL
+    product-mode: CLASSIC_ALL
+    products:
+      1:
+        material: PLAYER_HEAD
+        amount: 1
+        skull: PQguanfang
+    buy-prices:
+      1:
+        economy-type: exp
+        amount: 0
+        placeholder: '&6{amount} Exps'
+        start-apply: 0
+  #
+  # Firework Example
+  #
+  L:
+    price-mode: CLASSIC_ALL
+    product-mode: CLASSIC_ALL
+    products:
+      1:
+        material: FIREWORK_ROCKET
+        amount: 1
+        power: 127
+        firework:
+          1:
+            flicker: true
+            trial: true
+            colors:
+              base:
+                - 0xff0000
+              fade:
+                - 666666
+            type: BALL
+    buy-prices:
+      1:
+        economy-plugin: Vault
+        amount: 155
+        placeholder: '{amount}$'
+        start-apply: 0
+  #
+  # Color Armor Example
+  #
+  M:
+    price-mode: CLASSIC_ALL
+    product-mode: CLASSIC_ALL
+    products:
+      1:
+        material: LEATHER_CHESTPLATE
+        amount: 1
+        color: 50, 50, 50
+    buy-prices:
+      1:
+        economy-type: exp
+        amount: 0
+        placeholder: '&6{amount} Exps'
+        start-apply: 0
+  #
+  # Spawner Example
+  #
+  N:
+    price-mode: CLASSIC_ALL
+    product-mode: CLASSIC_ALL
+    products:
+      1:
+        material: spawner
+        spawner: cow
+        amount: 1
+    buy-prices:
+      1:
+        economy-plugin: Vault
+        amount: 5000
+        placeholder: '{amount}$'
+        start-apply: 0
+    buy-limits:
+      global: 5
+      default: 1
+    buy-times-reset-mode: 'TIMED'
+    # This means we will reset in 7 am and 7 pm each day.
+    buy-times-reset-time: '07:00:00;;19:00:00'
+  #
+  # Command Shop Example
+  #
+  O:
+    price-mode: CLASSIC_ALL
+    product-mode: CLASSIC_ALL
+    display-item:
+      name: 'Magic Crate Key'
+      material: PAPER
+      custom-model-data: 500
+      amount: 1
+    buy-prices:
+      1:
+        economy-plugin: Vault
+        amount: 150
+        placeholder: '{amount}$'
+    buy-actions:
+      1:
+        type: console_command
+        command: "crate give %player_name% magic"
+  #
+  # Total Custom Product
+  # Only PREMIUM version support this!
+  #
+  P:
+    products:
+      1:
+        # The product
+        material: APPLE
+        amount: 64
+    # If UltimateShop does not support your economy plugin.
+    buy-prices:
+      1:
+        placeholder: '{amount} Custom Economy'
+        # Buy Match Placeholder - Put your economy plugin placeholder here!
+        match-placeholder: '%economy_now_balance_placeholder%'
+        amount: 500
+        # Buy Take Actions
+        take-actions:
+          1:
+            multi-once: true
+            type: console_command
+            # Put your economy take command here!
+            command: 'eco take {player} {amount}'
+    sell-prices:
+      1:
+        placeholder: '{amount} Custom Economy'
+        # Sell Give Actions
+        give-actions:
+          1:
+            multi-once: true
+            type: 'console_command'
+            # Put your economy give command here!
+            command: 'eco give {player} {amount}'
+        amount: 500
+  #
+  # Save Item
+  #
+  Q:
+    display-item:
+      material: SUPER_APPLE # Put save item ID here!
+      # You need use command /shop saveitem SUPER_APPLE before this product can display in shop.
+    buy-prices:
+      1:
+        economy-type: exp
+        amount: 1
+        start-apply: 0
+        placeholder: '{amount} Exps'
+    sell-prices:
+      1:
+        economy-type: exp
+        amount: 1
+        start-apply: 0
+        placeholder: '{amount} Exps'
+  #
+  # Custom Product
+  # Requires MythicChanger plugin!
+  #
+  R:
+    display-item:
+      material: PAPER
+      custom-model-data: 200
+      name: '&fMagic Flight Paper &c(Level I)'
+      lore:
+        - '&fHold this and you can fly!'
+    products:
+      1:
+        # Custom Sell Match Rule - Explain the item match rule!
+        match-item:
+          contains-lore:
+            - 'Magic Flight Paper'
+        # Buy Give Command
+        give-actions:
+          1:
+            multi-once: true
+            type: console_command
+            command: 'flyitem give {player} {amount}' # Put custom item give command here!
+          2:
+            type: message
+            message: 'test message'
+        amount: 64
+    buy-prices:
+      1:
+        economy-type: exp
+        amount: 1
+        start-apply: 0
+        placeholder: '{amount} Exps'
+    sell-prices:
+      1:
+        economy-type: exp
+        amount: 1
+        start-apply: 0
+        placeholder: '{amount} Exps'
+  #
+  # Custom Reset
+  # The Cron expression in this example means to reset at 0:00 every Thursday
+  #
+  S:
+    products:
+      1:
+        material: echo_shard
+        amount: 1
+    buy-prices:
+      # Price from other economy plugins
+      1:
+        economy-plugin: EcoBits
+        economy-type: quest_points
+        amount: 5
+        placeholder: '&b{amount} Quest Points'
+        start-apply: 0
+    sell-prices:
+      # Price from other economy plugins
+      1:
+        economy-plugin: EcoBits
+        economy-type: quest_points
+        amount: 5
+        placeholder: '&b{amount} Quest Points'
+        start-apply: 0
+    sell-times-reset-mode: 'COOLDOWN_CUSTOM'
+    sell-times-reset-time: '{cron_"0 0 0 ? * 5"}'

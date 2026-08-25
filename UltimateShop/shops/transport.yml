@@ -1,0 +1,180 @@
+settings:
+  menu: 'example-shop-menu'
+  buy-more: true
+  shop-name: '{lang:transport-shop-name}'
+  hide-message: false
+  secret-shop-items: true
+  allow-favourite: true
+
+items:
+  A:
+    price-mode: CLASSIC_ALL
+    product-mode: CLASSIC_ALL
+    products:
+      1:
+        material: RAIL
+        amount: 1
+    buy-prices:
+      1:
+        economy-plugin: Vault
+        amount: '1.8'
+        placeholder: '{amount}$'
+        start-apply: 0
+    sell-prices:
+      1:
+        economy-plugin: Vault
+        amount: '1'
+        placeholder: '{amount}$'
+        start-apply: 0
+  B:
+    price-mode: CLASSIC_ALL
+    product-mode: CLASSIC_ALL
+    products:
+      1:
+        material: POWERED_RAIL
+        amount: 1
+    buy-prices:
+      1:
+        economy-plugin: Vault
+        amount: '7.5'
+        placeholder: '{amount}$'
+        start-apply: 0
+    sell-prices:
+      1:
+        economy-plugin: Vault
+        amount: '4.5'
+        placeholder: '{amount}$'
+        start-apply: 0
+  C:
+    price-mode: CLASSIC_ALL
+    product-mode: CLASSIC_ALL
+    products:
+      1:
+        material: ACTIVATOR_RAIL
+        amount: 1
+    buy-prices:
+      1:
+        economy-plugin: Vault
+        amount: '5.5'
+        placeholder: '{amount}$'
+        start-apply: 0
+    sell-prices:
+      1:
+        economy-plugin: Vault
+        amount: '3.3'
+        placeholder: '{amount}$'
+        start-apply: 0
+  D:
+    price-mode: CLASSIC_ALL
+    product-mode: CLASSIC_ALL
+    products:
+      1:
+        material: DETECTOR_RAIL
+        amount: 1
+    buy-prices:
+      1:
+        economy-plugin: Vault
+        amount: '5.5'
+        placeholder: '{amount}$'
+        start-apply: 0
+    sell-prices:
+      1:
+        economy-plugin: Vault
+        amount: '3.3'
+        placeholder: '{amount}$'
+        start-apply: 0
+  E:
+    price-mode: CLASSIC_ALL
+    product-mode: CLASSIC_ALL
+    products:
+      1:
+        material: MINECART
+        amount: 1
+    buy-prices:
+      1:
+        economy-plugin: Vault
+        amount: '14'
+        placeholder: '{amount}$'
+        start-apply: 0
+    sell-prices:
+      1:
+        economy-plugin: Vault
+        amount: '8.4'
+        placeholder: '{amount}$'
+        start-apply: 0
+  F:
+    price-mode: CLASSIC_ALL
+    product-mode: CLASSIC_ALL
+    products:
+      1:
+        material: CHEST_MINECART
+        amount: 1
+    buy-prices:
+      1:
+        economy-plugin: Vault
+        amount: '17'
+        placeholder: '{amount}$'
+        start-apply: 0
+    sell-prices:
+      1:
+        economy-plugin: Vault
+        amount: '10.2'
+        placeholder: '{amount}$'
+        start-apply: 0
+  G:
+    price-mode: CLASSIC_ALL
+    product-mode: CLASSIC_ALL
+    products:
+      1:
+        material: FURNACE_MINECART
+        amount: 1
+    buy-prices:
+      1:
+        economy-plugin: Vault
+        amount: '18'
+        placeholder: '{amount}$'
+        start-apply: 0
+    sell-prices:
+      1:
+        economy-plugin: Vault
+        amount: '10.8'
+        placeholder: '{amount}$'
+        start-apply: 0
+  H:
+    price-mode: CLASSIC_ALL
+    product-mode: CLASSIC_ALL
+    products:
+      1:
+        material: HOPPER_MINECART
+        amount: 1
+    buy-prices:
+      1:
+        economy-plugin: Vault
+        amount: '28'
+        placeholder: '{amount}$'
+        start-apply: 0
+    sell-prices:
+      1:
+        economy-plugin: Vault
+        amount: '16.8'
+        placeholder: '{amount}$'
+        start-apply: 0
+  I:
+    price-mode: CLASSIC_ALL
+    product-mode: CLASSIC_ALL
+    products:
+      1:
+        material: TNT_MINECART
+        amount: 1
+    buy-prices:
+      1:
+        economy-plugin: Vault
+        amount: '38'
+        placeholder: '{amount}$'
+        start-apply: 0
+    sell-prices:
+      1:
+        economy-plugin: Vault
+        amount: '22.8'
+        placeholder: '{amount}$'
+        start-apply: 0
