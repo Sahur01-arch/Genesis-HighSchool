@@ -130,7 +130,7 @@ webhook:
   - starttimer_started
   - endtimer_started
   # Copy and paste the webhook url from Server Settings --> Apps Integrations --> Webhooks
-  url: 'https://discord.com/api/webhooks/1534428183930343511/ecfn-vcC17fAE5aiCJVNFRetPiI1q7lj5nlxkfJu8uaGRPpo8ek3HPxDZ2q8vKN3NBY5'
+  url: ''
   # The username displayed for the webhook bot message.
   username: Maintenance
   # The avatar URL used for the webhook bot message. Leave empty to use the default Discord webhook avatar.
