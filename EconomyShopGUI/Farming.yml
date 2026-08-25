@@ -32,7 +32,7 @@ pages:
       '8':
         material: CARROT
         buy: 1.75
-        sell: 0.44
+        sell: 0.45
       '9':
         material: CHORUS_FLOWER
         buy: 0.35
