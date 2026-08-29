@@ -1,0 +1,53 @@
+# ==========================================
+# HANDLER S1 & S2 (KLIK KANAN & SNEAK)
+# ==========================================
+RedScythe_RightClick_Handler:
+  Skills:
+    # Jika pemain SEDANG jongkok/sneak (?sneaking), maka keluarkan S2
+    - skill{s=RedScythe_S2} @self ?sneaking
+    
+    # Jika pemain TIDAK jongkok (?!sneaking), maka keluarkan S1
+    - skill{s=RedScythe_S1} @self ?!sneaking
+
+
+# ==========================================
+# HANDLER S3 (SISTEM KOMBO 10x HIT)
+# ==========================================
+RedScythe_HitCounter:
+  Skills:
+    # 1. Tambahkan +1 ke variabel 'scythe_hits' milik pemain setiap kali memukul
+    - setvariable{var=caster.scythe_hits;val="<caster.var.scythe_hits>+1";type=INTEGER} @self
+    
+    # 2. Cek apakah hitungan sudah mencapai 10 (Panggil skill pengecek)
+    - skill{s=RedScythe_S3_Trigger} @self
+
+RedScythe_S3_Trigger:
+  Conditions:
+    # Kondisi: Skill ini hanya lanjut jika variabel 'scythe_hits' bernilai >= 10
+    - variableequals{var=caster.scythe_hits;value=>=10}
+  Skills:
+    # 3. Keluarkan S3 karena syarat 10x hit sudah terpenuhi!
+    - skill{s=RedScythe_S3} @self
+    
+    # 4. Reset variabel pukulan kembali ke 0 agar pemain harus memukul 10x lagi
+    - setvariable{var=caster.scythe_hits;val=0;type=INTEGER} @self
+
+
+# ==========================================
+# SKILL ASLI KAMU (Jangan dihapus, cukup panggil di atas)
+# ==========================================
+RedScythe_S1:
+  Skills:
+    - sound{s=entity.player.attack.sweep;v=1;p=1} @self
+    - particleline{particle=reddust;amount=1;db=0.15} @Forward{f=4;y=1}
+
+RedScythe_S2:
+  Skills:
+    - sound{s=entity.player.attack.sweep;v=1;p=0.8} @self
+    - particles{particle=reddust;amount=20;ys=1.5;xs=0.1;zs=0.1} @Forward{f=2;y=1}
+
+RedScythe_S3:
+  Skills:
+    - skill{s=RedScythe_S1} @self
+    - delay 3
+    - skill{s=RedScythe_S2} @self
