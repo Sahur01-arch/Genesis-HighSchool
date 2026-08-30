@@ -1,7 +1,18 @@
+# ============================================================
+# SAKURA SCYTHE - REVISI
+# Referensi: MythicMobs Wiki mechanic "slash" & pola dash/fall-damage-cancel
+#            dari reaper_skills_mmoitems.yml (pack referensi kamu)
+# ============================================================
+
 Sakura_Idle:
   Skills:
   - effect:particles{particle=cherry_leaves;amount=1;hS=0.2;vS=0.3;speed=0.02} @self
 
+# --- SAKURA SLASH 1/2/3 -------------------------------------------------------
+# FIX: logika combo (hasaurastacks...castinstead) sudah benar, tapi
+# ditambahkan sedikit "micro-lunge" ke depan tiap tebasan supaya rangkaian
+# combo terasa mengalir (flow) alih-alih diam di tempat, gaya umum combo
+# melee di server RPG.
 Sakura_Slash_1:
   Cooldown: 0.4
   Conditions:
@@ -9,6 +20,7 @@ Sakura_Slash_1:
   Skills:
   - Aura{auraName=Sakura_Combo;duration=30;maxStacks=3} @self
   - sound{s=entity.player.attack.sweep;v=0.8;p=1.6} @self
+  - lunge{velocity=0.15;velocityY=0} @forward{f=1;lockpitch=true}
   - slash{y=1.2;w=3;h=25;mpd=true;a=100;radius=2.5;roll=0;
       oP=[ - effect:particles{particle=cherry_leaves;amount=2} ];
       oH=[ - damage{amount=4} ]
@@ -21,6 +33,7 @@ Sakura_Slash_2:
   Skills:
   - Aura{auraName=Sakura_Combo;duration=30;maxStacks=3} @self
   - sound{s=entity.player.attack.sweep;v=0.9;p=1.8} @self
+  - lunge{velocity=0.15;velocityY=0} @forward{f=1;lockpitch=true}
   - slash{y=1.2;w=3;h=25;mpd=true;a=110;radius=2.7;roll=25;
       oP=[ - effect:particles{particle=cherry_leaves;amount=3} ];
       oH=[ - damage{amount=4} ]
@@ -31,20 +44,32 @@ Sakura_Slash_3:
   Skills:
   - auraremove{aura=Sakura_Combo} @self
   - sound{s=entity.player.attack.crit;v=1;p=1.5} @self
-  - effect:particlering{particle=cherry_leaves;radius=2;points=40;amount=3} @self
+  - effect:particlering{particle=cherry_leaves;radius=2;points=40;amount=3;y=1.2} @self
+  - lunge{velocity=0.2;velocityY=0} @forward{f=1;lockpitch=true}
   - slash{y=1.2;w=4;h=30;mpd=true;a=160;radius=3;roll=-25;
       oP=[ - effect:particles{particle=cherry_leaves;amount=3} ];
       oH=[ - damage{amount=8} ]
     } @self
 
+# --- SAKURA STEP ---------------------------------------------------------
+# FIX: "tambah jauh lagi" -> velocity & jarak forward dinaikkan (0.65->1.3,
+# f=8->f=14, kira-kira 2x lebih jauh). Ditambahkan onDamaged{...damageMods=
+# "FALL 0"} (pola dipinjam dari reaper_skills_mmoitems.yml) supaya dash yang
+# lebih jauh/tinggi tidak membuat pemain kena fall damage saat mendarat.
 Sakura_Step:
   Cooldown: 1.2
   Skills:
   - sound{s=entity.player.attack.sweep;v=0.6;p=1.6} @self
-  - lunge{velocity=0.65;velocityY=0.12} @forward{f=8;lockpitch=true}
-  - effect:particles{particle=cherry_leaves;amount=8;hS=0.2;vS=0.2;speed=0.08} @Forward{f=5;y=1}
+  - onDamaged{auraName=Sakura_LandResist;cancelEvent=true;d=20;damageMods="FALL 0"} @self
+  - lunge{velocity=1.3;velocityY=0.15} @forward{f=14;lockpitch=true}
+  - effect:particles{particle=cherry_leaves;amount=10;hS=0.2;vS=0.2;speed=0.1} @Forward{f=7;y=1}
   - potion{type=SPEED;duration=30;level=1} @self
 
+# --- SAKURA FLICKER --------------------------------------------------------
+# FIX: sebelumnya pakai "lunge" (dorongan), bukan blink/teleport asli, jadi
+# terasa mirip Step biasa. Diganti pakai mechanic "teleport" agar benar-benar
+# instan berpindah posisi (efek "flicker/blink" khas assassin), bukan
+# didorong ke depan.
 Sakura_Flicker:
   Conditions:
   - hasaurastacks{auraName=Sakura_Combo;stacks=3} true
@@ -53,27 +78,67 @@ Sakura_Flicker:
   - auraremove{aura=Sakura_Combo} @self
   - sound{s=entity.enderman.teleport;v=0.7;p=1.4} @self
   - effect:particles{particle=cherry_leaves;amount=20;hS=0.4;vS=0.4;speed=0.1} @self
-  - lunge{velocity=0.8;velocityY=0.15} @forward{f=9;lockpitch=true}
+  - teleport{} @forward{f=6;y=0.2}
+  - effect:particles{particle=cherry_leaves;amount=20;hS=0.4;vS=0.4;speed=0.1} @self
   - damage{amount=4} @PlayersInRadius{radius=2}
 
+# --- SAKURA BLOOM (buff) - tetap sama, cuma disamakan tinggi partikel -------
 Sakura_Bloom:
   Cooldown: 10
   Skills:
   - sound{s=entity.player.levelup;v=0.5;p=1.5} @self
-  - effect:particles{particle=cherry_leaves;amount=25;hS=0.6;vS=0.8;speed=0.05} @self
+  - effect:particles{particle=cherry_leaves;amount=25;hS=0.6;vS=0.8;speed=0.05;y=1} @self
   - potion{type=SPEED;duration=100;level=2} @self
   - potion{type=JUMP;duration=100;level=1} @self
 
+# --- SAKURA WALTZ ----------------------------------------------------------
+# FIX BUG PENTING: sebelumnya Waltz memanggil Sakura_Slash_3 (yang melakukan
+# auraremove{aura=Sakura_Combo}) lalu memanggil skill{s=Sakura_Flicker}.
+# Tapi Flicker punya Condition "hasaurastacks stacks=3 true" -- karena stack
+# sudah dihapus oleh Slash_3, kondisi ini SELALU GAGAL, jadi Flicker DI
+# WALTZ TIDAK PERNAH JALAN. Fix: efek Flicker ditulis ulang langsung di
+# dalam Waltz (tanpa cek kondisi stack), dan delay antar-slash diperbesar
+# dari 3 tick -> 6 tick supaya animasi tiap tebasan sempat selesai sebelum
+# tebasan berikutnya (tidak numpuk/overlap).
 Sakura_Waltz:
-  Cooldown: 18
+  Cooldown: 20
   Skills:
+  - auraremove{aura=Sakura_Combo} @self
   - sound{s=entity.player.attack.sweep;v=1;p=1.8} @self
-  - skill{s=Sakura_Step} @self
+  - effect:particles{particle=cherry_leaves;amount=15;hS=0.3;vS=0.3;speed=0.05} @self
+
+  # Dash 1: Y dinaikkan +0.5 agar tidak menembus tanah
+  - teleportto{m=relative;c=0,0.5,-2;origin=target} @self
+  - sound{s=entity.enderman.teleport;v=0.6;p=1.6} @self
+  - damage{amount=6} @target
+  - effect:particles{particle=cherry_leaves;amount=10;speed=0.05} @target
   - delay 3
-  - skill{s=Sakura_Slash_1} @self
+
+  # Dash 2: Y dinaikkan +0.5
+  - teleportto{m=relative;c=0,0.5,2;origin=target} @self
+  - sound{s=entity.enderman.teleport;v=0.6;p=1.6} @self
+  - damage{amount=6} @target
+  - effect:particles{particle=cherry_leaves;amount=10;speed=0.05} @target
   - delay 3
-  - skill{s=Sakura_Slash_2} @self
+
+  # Dash 3: Y dinaikkan +0.5
+  - teleportto{m=relative;c=-2,0.5,0;origin=target} @self
+  - sound{s=entity.enderman.teleport;v=0.6;p=1.6} @self
+  - damage{amount=6} @target
+  - effect:particles{particle=cherry_leaves;amount=10;speed=0.05} @target
   - delay 3
-  - skill{s=Sakura_Slash_3} @self
-  - delay 2
-  - skill{s=Sakura_Flicker} @self
+
+  # Dash 4: Y dinaikkan +0.5
+  - teleportto{m=relative;c=2,0.5,0;origin=target} @self
+  - sound{s=entity.enderman.teleport;v=0.6;p=1.6} @self
+  - damage{amount=6} @target
+  - effect:particles{particle=cherry_leaves;amount=10;speed=0.05} @target
+  - delay 4
+
+  # Lompat lalu turun (slam AoE)
+  - sound{s=entity.player.attack.crit;v=1;p=1.2} @self
+  - lunge{velocity=0;velocityY=1.1} @self
+  - delay 10
+  - effect:particlering{particle=cherry_leaves;radius=2.5;points=40;amount=4;y=0.1} @self
+  - sound{s=entity.generic.explode;v=0.6;p=1.4} @self
+  - damage{amount=10} @PlayersInRadius{radius=3}

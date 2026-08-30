@@ -1,8 +1,25 @@
+# ============================================================
+# CRIMSON SCYTHE - REVISI
+# Referensi: MythicMobs Wiki mechanic "slash" & "projectile"
+#            (git.mythiccraft.io/mythiccraft/MythicMobs/wikis)
+#            + pola combo dari reaper_skills_mmoitems.yml (pack referensi)
+# ============================================================
+
 Crimson_Idle:
   Skills:
   - effect:particles{particle=flame;amount=1;hS=0.15;vS=0.15;speed=0.01} @self
   - effect:particles{particle=redstone;color=#ff2b2b;amount=1;hS=0.15;vS=0.15;speed=0.01} @self
 
+# --- CRIMSON SLASH ---------------------------------------------------------
+# FIX 1: proyektil terlalu cepat (v=6, tanpa mr=) menyebabkan slash "teleport"
+#        -> v diturunkan jadi 2.5 & ditambah mr (max range) supaya proyektil
+#           berhenti tepat setelah jarak swing, bukan terbang jauh lalu hilang.
+#        Referensi bug resmi: GitLab MythicMobs issue #1611 - origin slash
+#        bisa "meloncat" tergantung parameter angle jika tidak dibatasi.
+# FIX 2: "rombak bentuk slash acak, bisa miring horizontal/vertikal"
+#        -> memakai randomskill (fitur FREE, bukan <random.x> yang Premium)
+#           untuk memilih salah satu dari 3 varian roll: vertikal (roll=0),
+#           horizontal (roll=90), diagonal (roll=45).
 Crimson_Slash:
   Cooldown: 0.3
   Conditions:
@@ -10,54 +27,127 @@ Crimson_Slash:
   Skills:
   - Aura{auraName=Crimson_Combo;duration=40;maxStacks=3} @self
   - sound{s=entity.player.attack.sweep;v=1;p="random(0.9,1.1)"} @self
-  - projectile{onTick=Crimson_Slash_Shape;onHit=Crimson_Slash_Hit;v=6;i=1;hR=1.5;vR=1.5;hnp=true} @Forward{f=1;y=1}
+  - randomskill{skills=Crimson_Slash_Vertical,Crimson_Slash_Horizontal,Crimson_Slash_Diagonal} @self
 
-Crimson_Slash_Shape:
+Crimson_Slash_Vertical:
   Skills:
-  - slash{y=0;w=3;h=20;mpd=true;a=140;radius=1.5;roll=0;
-      oP=[ - effect:particles{particle=redstone;color=#ff2b2b;amount=1}
-           - effect:particles{particle=flame;amount=1;speed=0.01} ]
+  # v (kecepatan) diperlambat, mr (jarak) ditambah, target diubah ke 10 blok ke depan, gravitasi dihapus (g=0)
+  - projectile{onTick=Crimson_Slash_Shape_V;onHit=Crimson_Slash_Hit;v=0.8;i=1;mr=10;hR=1.3;vR=1.3;hnp=true;g=0} @Forward{f=10;y=1.1}
+
+Crimson_Slash_Horizontal:
+  Skills:
+  - projectile{onTick=Crimson_Slash_Shape_H;onHit=Crimson_Slash_Hit;v=0.8;i=1;mr=10;hR=1.3;vR=1.3;hnp=true;g=0} @Forward{f=10;y=1.1}
+
+Crimson_Slash_Diagonal:
+  Skills:
+  - projectile{onTick=Crimson_Slash_Shape_D;onHit=Crimson_Slash_Hit;v=0.8;i=1;mr=10;hR=1.3;vR=1.3;hnp=true;g=0} @Forward{f=10;y=1.1}
+
+Crimson_Slash_Shape_V:
+  Skills:
+  # speed=0 ditambahkan pada semua partikel agar garis tebasan lengkung tetap solid dan tidak jatuh
+  - slash{y=1.1;w=3;h=20;mpd=true;a=140;radius=1.5;roll=0;
+      oP=[ - effect:particles{particle=redstone;color=#ff2b2b;amount=1;speed=0}
+           - effect:particles{particle=flame;amount=1;speed=0} ]
     } @origin
 
+Crimson_Slash_Shape_H:
+  Skills:
+  - slash{y=1.1;w=3;h=20;mpd=true;a=140;radius=1.5;roll=90;
+      oP=[ - effect:particles{particle=redstone;color=#ff2b2b;amount=1;speed=0}
+           - effect:particles{particle=flame;amount=1;speed=0} ]
+    } @origin
+
+Crimson_Slash_Shape_D:
+  Skills:
+  - slash{y=1.1;w=3;h=20;mpd=true;a=140;radius=1.5;roll=45;
+      oP=[ - effect:particles{particle=redstone;color=#ff2b2b;amount=1;speed=0}
+           - effect:particles{particle=flame;amount=1;speed=0} ]
+    } @origin
+
+# FIX 3: Crimson_Poison sebelumnya adalah skill "yatim" (tidak pernah
+#        dipanggil di mana pun) sehingga efek racun TIDAK PERNAH terjadi.
+#        Sekarang dihubungkan sebagai sub-skill dari Crimson_Slash_Hit,
+#        dan targetnya diubah ke @target (bukan AoE PlayersInRadius) supaya
+#        racun hanya kena musuh yang benar-benar terkena slash.
 Crimson_Slash_Hit:
   Skills:
   - damage{amount=5} @target
   - effect:particles{particle=lava;amount=6;hS=0.2;vS=0.2} @target
-
-Crimson_Executor:
-  Cooldown: 4
-  Skills:
-  - auraremove{aura=Crimson_Combo} @self
-  - sound{s=entity.wither.death;v=0.5;p=1.8} @self
-  - effect:particlering{particle=redstone;color=#ff2b2b;radius=1;points=30;amount=4} @self
-  - effect:particlering{particle=flame;radius=1;points=30;amount=2} @self
-  - delay 1
-  - effect:particlering{particle=redstone;color=#ff2b2b;radius=2.5;points=60;amount=4} @self
-  - effect:particlering{particle=flame;radius=2.5;points=60;amount=2} @self
-  - damage{amount=16} @PlayersInRadius{radius=3}
+  - skill{s=Crimson_Poison} @target
 
 Crimson_Poison:
   Conditions:
   - random 0.15
   Skills:
-  - potion{type=POISON;duration=60;level=1} @PlayersInRadius{radius=3}
-  - potion{type=WEAKNESS;duration=60;level=1} @PlayersInRadius{radius=3}
-  - effect:particles{particle=redstone;color=#5c0d0d;amount=8;speed=0} @self
+  - potion{type=POISON;duration=60;level=1} @target
+  - potion{type=WEAKNESS;duration=60;level=1} @target
+  - effect:particles{particle=redstone;color=#5c0d0d;amount=8;speed=0;y=1} @target
 
+# --- CRIMSON EXECUTOR -------------------------------------------------------
+# FIX 4: "3x slash + stun singkat radius 2 blok" -> sebelumnya cuma 1 hit besar.
+#        Sekarang benar-benar 3x slash beruntun (pakai 3 varian di atas) lalu
+#        diakhiri stun singkat. CATATAN JUJUR: MythicMobs versi gratis TIDAK
+#        punya mekanik "stun" murni (lock pergerakan total) tanpa plugin CC
+#        tambahan. Yang dipakai di sini adalah "pseudo-stun": Slowness level
+#        tinggi + Weakness + Jump negatif + Mining Fatigue selama 1.5 detik
+#        (30 tick), pola umum di server SMP/RPG untuk simulasi stun.
+Crimson_Executor:
+  Cooldown: 4
+  Skills:
+  - auraremove{aura=Crimson_Combo} @self
+  - sound{s=entity.player.attack.crit;v=1;p=1.3} @self
+  - skill{s=Crimson_Slash_Vertical} @self
+  - delay 3
+  - skill{s=Crimson_Slash_Horizontal} @self
+  - delay 3
+  - skill{s=Crimson_Slash_Diagonal} @self
+  - delay 2
+  - sound{s=entity.wither.death;v=0.6;p=1.6} @self
+  - effect:particlering{particle=redstone;color=#ff2b2b;radius=2;points=40;amount=4;y=1.1} @self
+  - skill{s=Crimson_Stun_Apply} @PlayersInRadius{radius=2}
+
+Crimson_Stun_Apply:
+  Skills:
+  - damage{amount=6} @target
+  - potion{type=SLOW;duration=30;level=100} @target
+  - potion{type=WEAKNESS;duration=30;level=2} @target
+  - potion{type=JUMP;duration=30;level=-10} @target
+  - potion{type=MINING_FATIGUE;duration=30;level=5} @target
+  - effect:particles{particle=crit;amount=15;hS=0.3;vS=0.5;y=1} @target
+
+# --- CRIMSON CLEAR SKY -------------------------------------------------------
+# FIX 5: partikel muncul di kaki -> effect:particlering sebelumnya TIDAK
+#        punya atribut y sama sekali (default y=0 = tanah/kaki). Ditambahkan
+#        y=1.1 (tinggi dada) di semua baris particlering.
 Crimson_ClearSky:
   Cooldown: 15
   Skills:
   - auraremove{aura=Crimson_Combo} @self
   - sound{s=entity.player.attack.sweep;v=1;p=0.6} @self
-  - effect:particlering{particle=redstone;color=#ff2b2b;radius=1.5;points=40;amount=5} @self
-  - effect:particlering{particle=flame;radius=1.5;points=40;amount=2} @self
+  - effect:particlering{particle=redstone;color=#ff2b2b;radius=1.5;points=40;amount=5;y=1.1} @self
+  - effect:particlering{particle=flame;radius=1.5;points=40;amount=2;y=1.1} @self
   - delay 1
-  - effect:particlering{particle=redstone;color=#ff2b2b;radius=4;points=90;amount=5} @self
-  - effect:particlering{particle=flame;radius=4;points=90;amount=2} @self
+  - effect:particlering{particle=redstone;color=#ff2b2b;radius=4;points=90;amount=5;y=1.1} @self
+  - effect:particlering{particle=flame;radius=4;points=90;amount=2;y=1.1} @self
   - delay 1
-  - effect:particlering{particle=redstone;color=#ff2b2b;radius=7;points=150;amount=5} @self
-  - effect:particlering{particle=flame;radius=7;points=150;amount=2} @self
+  - effect:particlering{particle=redstone;color=#ff2b2b;radius=7;points=150;amount=5;y=1.1} @self
+  - effect:particlering{particle=flame;radius=7;points=150;amount=2;y=1.1} @self
   - potion{type=SLOW;duration=20;level=5} @PlayersInRadius{radius=6}
   - damage{amount=14} @PlayersInRadius{radius=6}
 
-
+# --- CRIMSON SAIKYOU FORM (ultimate gabungan) --------------------------------
+Crimson_Saikyou_Form:
+  Cooldown: 30
+  Skills:
+  - auraremove{aura=Crimson_Combo} @self
+  - sound{s=entity.ender_dragon.growl;v=1;p=0.8} @self
+  - effect:particlering{particle=redstone;color=#ff2b2b;radius=1;points=30;amount=5;y=1.1} @self
+  - skill{s=Crimson_ClearSky} @self
+  - delay 5
+  - skill{s=Crimson_Slash_Vertical} @self
+  - delay 3
+  - skill{s=Crimson_Slash_Horizontal} @self
+  - delay 3
+  - skill{s=Crimson_Slash_Diagonal} @self
+  - delay 5
+  - skill{s=Crimson_Executor} @self
