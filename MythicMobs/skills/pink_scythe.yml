@@ -1,0 +1,79 @@
+Sakura_Idle:
+  Skills:
+  - effect:particles{particle=cherry_leaves;amount=1;hS=0.2;vS=0.3;speed=0.02} @self
+
+Sakura_Slash_1:
+  Cooldown: 0.4
+  Conditions:
+  - hasaurastacks{auraName=Sakura_Combo;stacks=1} castinstead Sakura_Slash_2
+  Skills:
+  - Aura{auraName=Sakura_Combo;duration=30;maxStacks=3} @self
+  - sound{s=entity.player.attack.sweep;v=0.8;p=1.6} @self
+  - slash{y=1.2;w=3;h=25;mpd=true;a=100;radius=2.5;roll=0;
+      oP=[ - effect:particles{particle=cherry_leaves;amount=2} ];
+      oH=[ - damage{amount=4} ]
+    } @self
+
+Sakura_Slash_2:
+  Cooldown: 0.4
+  Conditions:
+  - hasaurastacks{auraName=Sakura_Combo;stacks=2} castinstead Sakura_Slash_3
+  Skills:
+  - Aura{auraName=Sakura_Combo;duration=30;maxStacks=3} @self
+  - sound{s=entity.player.attack.sweep;v=0.9;p=1.8} @self
+  - slash{y=1.2;w=3;h=25;mpd=true;a=110;radius=2.7;roll=25;
+      oP=[ - effect:particles{particle=cherry_leaves;amount=3} ];
+      oH=[ - damage{amount=4} ]
+    } @self
+
+Sakura_Slash_3:
+  Cooldown: 1.5
+  Skills:
+  - auraremove{aura=Sakura_Combo} @self
+  - sound{s=entity.player.attack.crit;v=1;p=1.5} @self
+  - effect:particlering{particle=cherry_leaves;radius=2;points=40;amount=3} @self
+  - slash{y=1.2;w=4;h=30;mpd=true;a=160;radius=3;roll=-25;
+      oP=[ - effect:particles{particle=cherry_leaves;amount=3} ];
+      oH=[ - damage{amount=8} ]
+    } @self
+
+Sakura_Step:
+  Cooldown: 1.2
+  Skills:
+  - sound{s=entity.player.attack.sweep;v=0.6;p=1.6} @self
+  - lunge{velocity=0.65;velocityY=0.12} @forward{f=8;lockpitch=true}
+  - effect:particles{particle=cherry_leaves;amount=8;hS=0.2;vS=0.2;speed=0.08} @Forward{f=5;y=1}
+  - potion{type=SPEED;duration=30;level=1} @self
+
+Sakura_Flicker:
+  Conditions:
+  - hasaurastacks{auraName=Sakura_Combo;stacks=3} true
+  Cooldown: 3
+  Skills:
+  - auraremove{aura=Sakura_Combo} @self
+  - sound{s=entity.enderman.teleport;v=0.7;p=1.4} @self
+  - effect:particles{particle=cherry_leaves;amount=20;hS=0.4;vS=0.4;speed=0.1} @self
+  - lunge{velocity=0.8;velocityY=0.15} @forward{f=9;lockpitch=true}
+  - damage{amount=4} @PlayersInRadius{radius=2}
+
+Sakura_Bloom:
+  Cooldown: 10
+  Skills:
+  - sound{s=entity.player.levelup;v=0.5;p=1.5} @self
+  - effect:particles{particle=cherry_leaves;amount=25;hS=0.6;vS=0.8;speed=0.05} @self
+  - potion{type=SPEED;duration=100;level=2} @self
+  - potion{type=JUMP;duration=100;level=1} @self
+
+Sakura_Waltz:
+  Cooldown: 18
+  Skills:
+  - sound{s=entity.player.attack.sweep;v=1;p=1.8} @self
+  - skill{s=Sakura_Step} @self
+  - delay 3
+  - skill{s=Sakura_Slash_1} @self
+  - delay 3
+  - skill{s=Sakura_Slash_2} @self
+  - delay 3
+  - skill{s=Sakura_Slash_3} @self
+  - delay 2
+  - skill{s=Sakura_Flicker} @self

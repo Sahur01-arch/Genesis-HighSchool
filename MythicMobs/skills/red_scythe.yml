@@ -1,53 +1,63 @@
-# ==========================================
-# HANDLER S1 & S2 (KLIK KANAN & SNEAK)
-# ==========================================
-RedScythe_RightClick_Handler:
+Crimson_Idle:
   Skills:
-    # Jika pemain SEDANG jongkok/sneak (?sneaking), maka keluarkan S2
-    - skill{s=RedScythe_S2} @self ?sneaking
-    
-    # Jika pemain TIDAK jongkok (?!sneaking), maka keluarkan S1
-    - skill{s=RedScythe_S1} @self ?!sneaking
+  - effect:particles{particle=flame;amount=1;hS=0.15;vS=0.15;speed=0.01} @self
+  - effect:particles{particle=redstone;color=#ff2b2b;amount=1;hS=0.15;vS=0.15;speed=0.01} @self
 
-
-# ==========================================
-# HANDLER S3 (SISTEM KOMBO 10x HIT)
-# ==========================================
-RedScythe_HitCounter:
-  Skills:
-    # 1. Tambahkan +1 ke variabel 'scythe_hits' milik pemain setiap kali memukul
-    - setvariable{var=caster.scythe_hits;val="<caster.var.scythe_hits>+1";type=INTEGER} @self
-    
-    # 2. Cek apakah hitungan sudah mencapai 10 (Panggil skill pengecek)
-    - skill{s=RedScythe_S3_Trigger} @self
-
-RedScythe_S3_Trigger:
+Crimson_Slash:
+  Cooldown: 0.3
   Conditions:
-    # Kondisi: Skill ini hanya lanjut jika variabel 'scythe_hits' bernilai >= 10
-    - variableequals{var=caster.scythe_hits;value=>=10}
+  - hasaurastacks{auraName=Crimson_Combo;stacks=2} castinstead Crimson_Executor
   Skills:
-    # 3. Keluarkan S3 karena syarat 10x hit sudah terpenuhi!
-    - skill{s=RedScythe_S3} @self
-    
-    # 4. Reset variabel pukulan kembali ke 0 agar pemain harus memukul 10x lagi
-    - setvariable{var=caster.scythe_hits;val=0;type=INTEGER} @self
+  - Aura{auraName=Crimson_Combo;duration=40;maxStacks=3} @self
+  - sound{s=entity.player.attack.sweep;v=1;p="random(0.9,1.1)"} @self
+  - projectile{onTick=Crimson_Slash_Shape;onHit=Crimson_Slash_Hit;v=6;i=1;hR=1.5;vR=1.5;hnp=true} @Forward{f=1;y=1}
+
+Crimson_Slash_Shape:
+  Skills:
+  - slash{y=0;w=3;h=20;mpd=true;a=140;radius=1.5;roll=0;
+      oP=[ - effect:particles{particle=redstone;color=#ff2b2b;amount=1}
+           - effect:particles{particle=flame;amount=1;speed=0.01} ]
+    } @origin
+
+Crimson_Slash_Hit:
+  Skills:
+  - damage{amount=5} @target
+  - effect:particles{particle=lava;amount=6;hS=0.2;vS=0.2} @target
+
+Crimson_Executor:
+  Cooldown: 4
+  Skills:
+  - auraremove{aura=Crimson_Combo} @self
+  - sound{s=entity.wither.death;v=0.5;p=1.8} @self
+  - effect:particlering{particle=redstone;color=#ff2b2b;radius=1;points=30;amount=4} @self
+  - effect:particlering{particle=flame;radius=1;points=30;amount=2} @self
+  - delay 1
+  - effect:particlering{particle=redstone;color=#ff2b2b;radius=2.5;points=60;amount=4} @self
+  - effect:particlering{particle=flame;radius=2.5;points=60;amount=2} @self
+  - damage{amount=16} @PlayersInRadius{radius=3}
+
+Crimson_Poison:
+  Conditions:
+  - random 0.15
+  Skills:
+  - potion{type=POISON;duration=60;level=1} @PlayersInRadius{radius=3}
+  - potion{type=WEAKNESS;duration=60;level=1} @PlayersInRadius{radius=3}
+  - effect:particles{particle=redstone;color=#5c0d0d;amount=8;speed=0} @self
+
+Crimson_ClearSky:
+  Cooldown: 15
+  Skills:
+  - auraremove{aura=Crimson_Combo} @self
+  - sound{s=entity.player.attack.sweep;v=1;p=0.6} @self
+  - effect:particlering{particle=redstone;color=#ff2b2b;radius=1.5;points=40;amount=5} @self
+  - effect:particlering{particle=flame;radius=1.5;points=40;amount=2} @self
+  - delay 1
+  - effect:particlering{particle=redstone;color=#ff2b2b;radius=4;points=90;amount=5} @self
+  - effect:particlering{particle=flame;radius=4;points=90;amount=2} @self
+  - delay 1
+  - effect:particlering{particle=redstone;color=#ff2b2b;radius=7;points=150;amount=5} @self
+  - effect:particlering{particle=flame;radius=7;points=150;amount=2} @self
+  - potion{type=SLOW;duration=20;level=5} @PlayersInRadius{radius=6}
+  - damage{amount=14} @PlayersInRadius{radius=6}
 
 
-# ==========================================
-# SKILL ASLI KAMU (Jangan dihapus, cukup panggil di atas)
-# ==========================================
-RedScythe_S1:
-  Skills:
-    - sound{s=entity.player.attack.sweep;v=1;p=1} @self
-    - particleline{particle=reddust;amount=1;db=0.15} @Forward{f=4;y=1}
-
-RedScythe_S2:
-  Skills:
-    - sound{s=entity.player.attack.sweep;v=1;p=0.8} @self
-    - particles{particle=reddust;amount=20;ys=1.5;xs=0.1;zs=0.1} @Forward{f=2;y=1}
-
-RedScythe_S3:
-  Skills:
-    - skill{s=RedScythe_S1} @self
-    - delay 3
-    - skill{s=RedScythe_S2} @self
