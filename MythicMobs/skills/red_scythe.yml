@@ -1,9 +1,41 @@
+# ============================================================
+# CRIMSON SCYTHE - REVISI (v3: reverse-engineered dari SimpleSlash.yml)
+#
+# PERUBAHAN ARSITEKTUR PENTING:
+# - Mekanik "slash{}" yang dipakai sebelumnya DIHAPUS TOTAL karena tidak
+#   terverifikasi sebagai mekanik gratis yang valid di MythicMobs.
+# - Diganti teknik dari SimpleSlash.yml: bentuk digambar titik-per-titik
+#   pakai projectile{v=0;mr=1;d=2} (projectile diam, cuma "kedip" 1 partikel
+#   di koordinat presisi syo/sso/sfo), lalu titik2 itu diungkap berurutan
+#   pakai "delay 1" -> beranimasi.
+# - DETEKSI HIT (damage) sekarang DIPISAH TOTAL dari VISUAL (bentuk slash).
+#   Ini akar penyebab "proyektil kena musuh sekali visualnya kepotong"
+#   sebelumnya: dulu bentuk digambar via onTick dari proyektil yg bergerak
+#   & bisa berhenti kapan saja saat kena musuh. Sekarang bentuk selalu
+#   selesai digambar penuh (independen), proyektil hit-check terpisah kecil
+#   di depan cuma untuk menentukan kena/tidak.
+#
+# MATEMATIKA BENTUK (lihat analisa):
+# Tiap titik = lingkaran radius R, pivot R di depan pemain, sudut theta dari
+# -halfAngle..+halfAngle:
+#   fwd_local = R*cos(theta) ;  a_local = R*sin(theta)
+#   side = a_local*cos(roll) ;  vert = a_local*sin(roll)
+#   sfo = F0 + (R - fwd_local) ; sso = side ; syo = Y0 + vert
+# roll=0 -> vertikal murni | roll=90 -> horizontal murni | roll=45 -> diagonal
+# ============================================================
+
 Crimson_Idle:
   Skills:
   - effect:particles{particle=flame;amount=1;hS=0.15;vS=0.15;speed=0} @self
   - effect:particles{particle=redstone;color=#ff2b2b;amount=1;hS=0.15;vS=0.15;speed=0} @self
 
-# --- CRIMSON SLASH (Proyektil Meluncur ke Depan) ---
+# Satu "titik" slash (dipanggil puluhan kali oleh projectile ot= di bawah)
+Crimson_Point:
+  Skills:
+  - effect:particles{particle=redstone;color=#ff2b2b;amount=1;speed=0} @origin
+  - effect:particles{particle=flame;amount=1;speed=0} @origin
+
+# --- CRIMSON SLASH ---------------------------------------------------------
 Crimson_Slash:
   Cooldown: 0.3
   Conditions:
@@ -13,42 +45,105 @@ Crimson_Slash:
   - sound{s=entity.player.attack.sweep;v=1;p="random(0.9,1.1)"} @self
   - randomskill{skills=Crimson_Slash_Vertical,Crimson_Slash_Horizontal,Crimson_Slash_Diagonal} @self
 
-# Proyektil ditembakkan ke depan. v=1 (kecepatan stabil), mr=10 (jarak), g=0 (anti gravitasi)
+# Deteksi hit: proyektil kecil BERGERAK (v>0) terpisah dari visual.
+Crimson_Slash_HitCheck:
+  Skills:
+  - projectile{onHit=Crimson_Slash_Hit;v=2.2;i=1;mr=2.2;hR=1.3;vR=1.3;hnp=true;g=0} @Forward{f=0.5;y=1.1}
+
 Crimson_Slash_Vertical:
   Skills:
-  - projectile{onTick=Crimson_Slash_Shape_V;onHit=Crimson_Slash_Hit;v=1;i=1;mr=10;hR=1.5;vR=1.5;hnp=true;g=0} @Forward{f=1;y=1.1}
+  - skill{s=Crimson_Slash_HitCheck} @self
+  - skill{s=Crimson_Slash_Shape_V} @self
 
 Crimson_Slash_Horizontal:
   Skills:
-  - projectile{onTick=Crimson_Slash_Shape_H;onHit=Crimson_Slash_Hit;v=1;i=1;mr=10;hR=1.5;vR=1.5;hnp=true;g=0} @Forward{f=1;y=1.1}
+  - skill{s=Crimson_Slash_HitCheck} @self
+  - skill{s=Crimson_Slash_Shape_H} @self
 
 Crimson_Slash_Diagonal:
   Skills:
-  - projectile{onTick=Crimson_Slash_Shape_D;onHit=Crimson_Slash_Hit;v=1;i=1;mr=10;hR=1.5;vR=1.5;hnp=true;g=0} @Forward{f=1;y=1.1}
+  - skill{s=Crimson_Slash_HitCheck} @self
+  - skill{s=Crimson_Slash_Shape_D} @self
 
-# Bentuk slash digambar mengikuti origin (posisi proyektil saat ini). speed=0 agar garis tetap solid.
+# Bentuk visual (murni titik-titik diam, tidak bergerak, tidak bisa "kepotong")
 Crimson_Slash_Shape_V:
   Skills:
-  - slash{y=0;w=3;h=20;mpd=true;a=140;radius=1.5;roll=0;
-      oP=[ - effect:particles{particle=redstone;color=#ff2b2b;amount=1;speed=0}
-           - effect:particles{particle=flame;amount=1;speed=0} ]
-    } @origin
+  - projectile{syo=1.1;sso=-1.45;sfo=1.424;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.1;sso=-1.359;sfo=1.256;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.1;sso=-1.249;sfo=1.1;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.1;sso=-1.121;sfo=0.958;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.1;sso=-0.977;sfo=0.833;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - delay 1
+  - projectile{syo=1.1;sso=-0.819;sfo=0.726;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.1;sso=-0.649;sfo=0.638;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.1;sso=-0.471;sfo=0.571;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.1;sso=-0.285;sfo=0.526;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.1;sso=-0.095;sfo=0.503;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - delay 1
+  - projectile{syo=1.1;sso=0.095;sfo=0.503;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.1;sso=0.285;sfo=0.526;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.1;sso=0.471;sfo=0.571;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.1;sso=0.649;sfo=0.638;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.1;sso=0.819;sfo=0.726;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - delay 1
+  - projectile{syo=1.1;sso=0.977;sfo=0.833;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.1;sso=1.121;sfo=0.958;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.1;sso=1.249;sfo=1.1;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.1;sso=1.359;sfo=1.256;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.1;sso=1.45;sfo=1.424;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
 
 Crimson_Slash_Shape_H:
   Skills:
-  - slash{y=0;w=3;h=20;mpd=true;a=140;radius=1.5;roll=90;
-      oP=[ - effect:particles{particle=redstone;color=#ff2b2b;amount=1;speed=0}
-           - effect:particles{particle=flame;amount=1;speed=0} ]
-    } @origin
+  - projectile{syo=-0.35;sso=-0.0;sfo=1.424;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=-0.259;sso=-0.0;sfo=1.256;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=-0.149;sso=-0.0;sfo=1.1;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=-0.021;sso=-0.0;sfo=0.958;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=0.123;sso=-0.0;sfo=0.833;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - delay 1
+  - projectile{syo=0.281;sso=-0.0;sfo=0.726;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=0.451;sso=-0.0;sfo=0.638;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=0.629;sso=-0.0;sfo=0.571;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=0.815;sso=-0.0;sfo=0.526;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.005;sso=-0.0;sfo=0.503;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - delay 1
+  - projectile{syo=1.195;sso=0.0;sfo=0.503;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.385;sso=0.0;sfo=0.526;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.571;sso=0.0;sfo=0.571;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.749;sso=0.0;sfo=0.638;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.919;sso=0.0;sfo=0.726;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - delay 1
+  - projectile{syo=2.077;sso=0.0;sfo=0.833;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=2.221;sso=0.0;sfo=0.958;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=2.349;sso=0.0;sfo=1.1;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=2.459;sso=0.0;sfo=1.256;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=2.55;sso=0.0;sfo=1.424;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
 
 Crimson_Slash_Shape_D:
   Skills:
-  - slash{y=0;w=3;h=20;mpd=true;a=140;radius=1.5;roll=45;
-      oP=[ - effect:particles{particle=redstone;color=#ff2b2b;amount=1;speed=0}
-           - effect:particles{particle=flame;amount=1;speed=0} ]
-    } @origin
+  - projectile{syo=0.075;sso=-1.025;sfo=1.424;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=0.139;sso=-0.961;sfo=1.256;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=0.217;sso=-0.883;sfo=1.1;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=0.307;sso=-0.793;sfo=0.958;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=0.409;sso=-0.691;sfo=0.833;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - delay 1
+  - projectile{syo=0.521;sso=-0.579;sfo=0.726;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=0.641;sso=-0.459;sfo=0.638;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=0.767;sso=-0.333;sfo=0.571;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=0.898;sso=-0.202;sfo=0.526;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.032;sso=-0.068;sfo=0.503;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - delay 1
+  - projectile{syo=1.168;sso=0.068;sfo=0.503;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.302;sso=0.202;sfo=0.526;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.433;sso=0.333;sfo=0.571;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.559;sso=0.459;sfo=0.638;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.679;sso=0.579;sfo=0.726;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - delay 1
+  - projectile{syo=1.791;sso=0.691;sfo=0.833;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.893;sso=0.793;sfo=0.958;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.983;sso=0.883;sfo=1.1;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=2.061;sso=0.961;sfo=1.256;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=2.125;sso=1.025;sfo=1.424;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
 
-# Dipicu otomatis saat proyektil menabrak musuh
 Crimson_Slash_Hit:
   Skills:
   - damage{amount=5} @target
@@ -63,18 +158,18 @@ Crimson_Poison:
   - potion{type=WEAKNESS;duration=60;level=1} @target
   - effect:particles{particle=redstone;color=#5c0d0d;amount=3;speed=0;y=1} @target
 
-# --- CRIMSON EXECUTOR ---
+# --- CRIMSON EXECUTOR --------------------------------------------------------
 Crimson_Executor:
   Cooldown: 4
   Skills:
   - auraremove{aura=Crimson_Combo} @self
   - sound{s=entity.player.attack.crit;v=1;p=1.3} @self
   - skill{s=Crimson_Slash_Vertical} @self
-  - delay 2
+  - delay 4
   - skill{s=Crimson_Slash_Horizontal} @self
-  - delay 2
+  - delay 4
   - skill{s=Crimson_Slash_Diagonal} @self
-  - delay 2
+  - delay 3
   - sound{s=entity.wither.death;v=0.6;p=1.6} @self
   - effect:particlering{particle=redstone;color=#ff2b2b;radius=2;points=20;amount=2;y=1.1} @self
   - skill{s=Crimson_Stun_Apply} @PlayersInRadius{radius=2}
@@ -88,36 +183,259 @@ Crimson_Stun_Apply:
   - potion{type=MINING_FATIGUE;duration=30;level=5} @target
   - effect:particles{particle=crit;amount=5;hS=0.2;vS=0.3;y=1;speed=0} @target
 
-# --- CRIMSON CLEAR SKY ---
+# --- CRIMSON CLEAR SKY -------------------------------------------------------
+# Bentuk baru: 3 cincin dihitung matematis (lingkaran penuh 360, 32 titik/cincin)
+# + kenaikan tinggi kecil per titik (rise_per_point) supaya jadi pusaran naik
+# tipis, bukan cincin datar biasa. y dasar = 1.0 (dada), naik pelan ke atas.
 Crimson_ClearSky:
   Cooldown: 15
   Skills:
   - auraremove{aura=Crimson_Combo} @self
   - sound{s=entity.player.attack.sweep;v=1;p=0.6} @self
-  - effect:particlering{particle=redstone;color=#ff2b2b;radius=1.5;points=20;amount=2;y=1.1} @self
-  - effect:particlering{particle=flame;radius=1.5;points=20;amount=1;y=1.1} @self
+  - projectile{syo=1.0;sso=0.0;sfo=1.5;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.01;sso=0.293;sfo=1.471;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.02;sso=0.574;sfo=1.386;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.03;sso=0.833;sfo=1.247;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.04;sso=1.061;sfo=1.061;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.05;sso=1.247;sfo=0.833;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.06;sso=1.386;sfo=0.574;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.07;sso=1.471;sfo=0.293;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
   - delay 1
-  - effect:particlering{particle=redstone;color=#ff2b2b;radius=4;points=40;amount=2;y=1.1} @self
-  - effect:particlering{particle=flame;radius=4;points=40;amount=1;y=1.1} @self
+  - projectile{syo=1.08;sso=1.5;sfo=0.0;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.09;sso=1.471;sfo=-0.293;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.1;sso=1.386;sfo=-0.574;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.11;sso=1.247;sfo=-0.833;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.12;sso=1.061;sfo=-1.061;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.13;sso=0.833;sfo=-1.247;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.14;sso=0.574;sfo=-1.386;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.15;sso=0.293;sfo=-1.471;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
   - delay 1
-  - effect:particlering{particle=redstone;color=#ff2b2b;radius=7;points=60;amount=2;y=1.1} @self
-  - effect:particlering{particle=flame;radius=7;points=60;amount=1;y=1.1} @self
+  - projectile{syo=1.16;sso=0.0;sfo=-1.5;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.17;sso=-0.293;sfo=-1.471;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.18;sso=-0.574;sfo=-1.386;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.19;sso=-0.833;sfo=-1.247;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.2;sso=-1.061;sfo=-1.061;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.21;sso=-1.247;sfo=-0.833;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.22;sso=-1.386;sfo=-0.574;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.23;sso=-1.471;sfo=-0.293;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - delay 1
+  - projectile{syo=1.24;sso=-1.5;sfo=-0.0;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.25;sso=-1.471;sfo=0.293;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.26;sso=-1.386;sfo=0.574;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.27;sso=-1.247;sfo=0.833;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.28;sso=-1.061;sfo=1.061;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.29;sso=-0.833;sfo=1.247;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.3;sso=-0.574;sfo=1.386;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.31;sso=-0.293;sfo=1.471;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - delay 1
+  - projectile{syo=1.0;sso=0.0;sfo=4.0;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.008;sso=0.78;sfo=3.923;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.016;sso=1.531;sfo=3.696;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.024;sso=2.222;sfo=3.326;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.032;sso=2.828;sfo=2.828;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.04;sso=3.326;sfo=2.222;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.048;sso=3.696;sfo=1.531;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.056;sso=3.923;sfo=0.78;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - delay 1
+  - projectile{syo=1.064;sso=4.0;sfo=0.0;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.072;sso=3.923;sfo=-0.78;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.08;sso=3.696;sfo=-1.531;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.088;sso=3.326;sfo=-2.222;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.096;sso=2.828;sfo=-2.828;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.104;sso=2.222;sfo=-3.326;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.112;sso=1.531;sfo=-3.696;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.12;sso=0.78;sfo=-3.923;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - delay 1
+  - projectile{syo=1.128;sso=0.0;sfo=-4.0;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.136;sso=-0.78;sfo=-3.923;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.144;sso=-1.531;sfo=-3.696;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.152;sso=-2.222;sfo=-3.326;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.16;sso=-2.828;sfo=-2.828;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.168;sso=-3.326;sfo=-2.222;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.176;sso=-3.696;sfo=-1.531;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.184;sso=-3.923;sfo=-0.78;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - delay 1
+  - projectile{syo=1.192;sso=-4.0;sfo=-0.0;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.2;sso=-3.923;sfo=0.78;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.208;sso=-3.696;sfo=1.531;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.216;sso=-3.326;sfo=2.222;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.224;sso=-2.828;sfo=2.828;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.232;sso=-2.222;sfo=3.326;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.24;sso=-1.531;sfo=3.696;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.248;sso=-0.78;sfo=3.923;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - delay 1
+  - projectile{syo=1.0;sso=0.0;sfo=7.0;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.006;sso=1.366;sfo=6.865;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.012;sso=2.679;sfo=6.467;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.018;sso=3.889;sfo=5.82;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.024;sso=4.95;sfo=4.95;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.03;sso=5.82;sfo=3.889;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.036;sso=6.467;sfo=2.679;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.042;sso=6.865;sfo=1.366;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - delay 1
+  - projectile{syo=1.048;sso=7.0;sfo=0.0;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.054;sso=6.865;sfo=-1.366;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.06;sso=6.467;sfo=-2.679;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.066;sso=5.82;sfo=-3.889;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.072;sso=4.95;sfo=-4.95;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.078;sso=3.889;sfo=-5.82;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.084;sso=2.679;sfo=-6.467;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.09;sso=1.366;sfo=-6.865;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - delay 1
+  - projectile{syo=1.096;sso=0.0;sfo=-7.0;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.102;sso=-1.366;sfo=-6.865;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.108;sso=-2.679;sfo=-6.467;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.114;sso=-3.889;sfo=-5.82;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.12;sso=-4.95;sfo=-4.95;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.126;sso=-5.82;sfo=-3.889;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.132;sso=-6.467;sfo=-2.679;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.138;sso=-6.865;sfo=-1.366;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - delay 1
+  - projectile{syo=1.144;sso=-7.0;sfo=-0.0;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.15;sso=-6.865;sfo=1.366;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.156;sso=-6.467;sfo=2.679;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.162;sso=-5.82;sfo=3.889;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.168;sso=-4.95;sfo=4.95;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.174;sso=-3.889;sfo=5.82;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.18;sso=-2.679;sfo=6.467;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.186;sso=-1.366;sfo=6.865;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
   - potion{type=SLOW;duration=20;level=5} @PlayersInRadius{radius=6}
   - damage{amount=14} @PlayersInRadius{radius=6}
 
-# --- CRIMSON SAIKYOU FORM ---
+# --- CRIMSON SAIKYOU FORM ----------------------------------------------------
+# Bentuk baru: "star burst" 4 lengan (N/NE/E/SE = roll 0/45/90/135) ditembakkan
+# BERSAMAAN (bukan berurutan) -> kilatan bintang 8 arah dalam 1 frame,
+# baru disusul ClearSky (pusaran) dan Executor (3x tebas + stun).
+Crimson_Saikyou_Star_N:
+  Skills:
+  - projectile{syo=1.1;sso=-2.364;sfo=2.383;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.1;sso=-2.246;sfo=1.953;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.1;sso=-2.05;sfo=1.552;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.1;sso=-1.784;sfo=1.194;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.1;sso=-1.455;sfo=0.892;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.1;sso=-1.077;sfo=0.655;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.1;sso=-0.662;sfo=0.493;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.1;sso=-0.223;sfo=0.41;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - delay 1
+  - projectile{syo=1.1;sso=0.223;sfo=0.41;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.1;sso=0.662;sfo=0.493;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.1;sso=1.077;sfo=0.655;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.1;sso=1.455;sfo=0.892;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.1;sso=1.784;sfo=1.194;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.1;sso=2.05;sfo=1.552;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.1;sso=2.246;sfo=1.953;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.1;sso=2.364;sfo=2.383;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+Crimson_Saikyou_Star_NE:
+  Skills:
+  - projectile{syo=-0.571;sso=-1.671;sfo=2.383;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=-0.488;sso=-1.588;sfo=1.953;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=-0.35;sso=-1.45;sfo=1.552;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=-0.161;sso=-1.261;sfo=1.194;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=0.071;sso=-1.029;sfo=0.892;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=0.338;sso=-0.762;sfo=0.655;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=0.632;sso=-0.468;sfo=0.493;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=0.942;sso=-0.158;sfo=0.41;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - delay 1
+  - projectile{syo=1.258;sso=0.158;sfo=0.41;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.568;sso=0.468;sfo=0.493;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.862;sso=0.762;sfo=0.655;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=2.129;sso=1.029;sfo=0.892;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=2.361;sso=1.261;sfo=1.194;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=2.55;sso=1.45;sfo=1.552;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=2.688;sso=1.588;sfo=1.953;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=2.771;sso=1.671;sfo=2.383;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+Crimson_Saikyou_Star_E:
+  Skills:
+  - projectile{syo=-1.264;sso=-0.0;sfo=2.383;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=-1.146;sso=-0.0;sfo=1.953;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=-0.95;sso=-0.0;sfo=1.552;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=-0.684;sso=-0.0;sfo=1.194;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=-0.355;sso=-0.0;sfo=0.892;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=0.023;sso=-0.0;sfo=0.655;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=0.438;sso=-0.0;sfo=0.493;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=0.877;sso=-0.0;sfo=0.41;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - delay 1
+  - projectile{syo=1.323;sso=0.0;sfo=0.41;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.762;sso=0.0;sfo=0.493;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=2.177;sso=0.0;sfo=0.655;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=2.555;sso=0.0;sfo=0.892;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=2.884;sso=0.0;sfo=1.194;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=3.15;sso=0.0;sfo=1.552;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=3.346;sso=0.0;sfo=1.953;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=3.464;sso=0.0;sfo=2.383;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+Crimson_Saikyou_Star_SE:
+  Skills:
+  - projectile{syo=-0.571;sso=1.671;sfo=2.383;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=-0.488;sso=1.588;sfo=1.953;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=-0.35;sso=1.45;sfo=1.552;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=-0.161;sso=1.261;sfo=1.194;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=0.071;sso=1.029;sfo=0.892;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=0.338;sso=0.762;sfo=0.655;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=0.632;sso=0.468;sfo=0.493;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=0.942;sso=0.158;sfo=0.41;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - delay 1
+  - projectile{syo=1.258;sso=-0.158;sfo=0.41;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.568;sso=-0.468;sfo=0.493;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=1.862;sso=-0.762;sfo=0.655;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=2.129;sso=-1.029;sfo=0.892;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=2.361;sso=-1.261;sfo=1.194;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=2.55;sso=-1.45;sfo=1.552;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=2.688;sso=-1.588;sfo=1.953;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+  - projectile{syo=2.771;sso=-1.671;sfo=2.383;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Crimson_Point} @SelfLocation
+
 Crimson_Saikyou_Form:
   Cooldown: 30
   Skills:
   - auraremove{aura=Crimson_Combo} @self
   - sound{s=entity.ender_dragon.growl;v=1;p=0.8} @self
-  - effect:particlering{particle=redstone;color=#ff2b2b;radius=1;points=20;amount=2;y=1.1} @self
+  - skill{s=Crimson_Saikyou_Star_N} @self
+  - skill{s=Crimson_Saikyou_Star_NE} @self
+  - skill{s=Crimson_Saikyou_Star_E} @self
+  - skill{s=Crimson_Saikyou_Star_SE} @self
+  - damage{amount=10} @PlayersInRadius{radius=2.4}
+  - delay 4
   - skill{s=Crimson_ClearSky} @self
-  - delay 3
+  - delay 6
   - skill{s=Crimson_Slash_Vertical} @self
-  - delay 2
+  - delay 4
   - skill{s=Crimson_Slash_Horizontal} @self
-  - delay 2
+  - delay 4
   - skill{s=Crimson_Slash_Diagonal} @self
-  - delay 3
+  - delay 5
   - skill{s=Crimson_Executor} @self
+
+# ============================================================
+# ROUTER - dipanggil dari item (Oraxen/Skript) via "mm test cast <skill>"
+# ============================================================
+# Klik kanan          -> Slash biasa
+# Sneak+Jump+klik kanan -> Saikyou Form
+Crimson_RightClick_Router:
+  Cooldown: 0.3
+  Conditions:
+  - crouching true castinstead Crimson_RightClick_CrouchCheck
+  Skills:
+  - skill{s=Crimson_Slash} @self
+
+Crimson_RightClick_CrouchCheck:
+  Conditions:
+  - jumping true castinstead Crimson_Saikyou_Form
+  Skills:
+  - skill{s=Crimson_Slash} @self
+
+# Sneak + klik kiri, HARUS kena entity -> Clear Sky
+# (proyektil kecil dulu; Clear Sky sendiri sudah ber-Condition "crouching true"
+#  jadi tidak akan meledak kalau dipanggil dari jalur lain tanpa sneak)
+Crimson_LeftClick_Router:
+  Conditions:
+  - crouching true castinstead Crimson_ClearSky_Attempt
+  Skills:
+  - sound{s=item.book.page_turn;v=0.3;p=1.5} @self
+
+Crimson_ClearSky_Attempt:
+  Cooldown: 15
+  Skills:
+  - projectile{onHit=Crimson_ClearSky_Confirm;v=3;i=1;mr=3;hR=1.5;vR=1.5;hnp=true} @Forward{f=1;y=1.1}
+
+Crimson_ClearSky_Confirm:
+  Skills:
+  - skill{s=Crimson_ClearSky} @self
