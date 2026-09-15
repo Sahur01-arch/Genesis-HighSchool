@@ -1,0 +1,425 @@
+origins:
+  pumpkin_hate:
+    # Poison the player when consuming pumpkin pie rather than preventing them from eating it
+    consume_and_poison: false
+  weak_arms:
+    # Blocks that count as natural stone
+    natural_stones:
+    - minecraft:stone
+    - minecraft:tuff
+    - minecraft:granite
+    - minecraft:diorite
+    - minecraft:andesite
+    - minecraft:sandstone
+    - minecraft:smooth_sandstone
+    - minecraft:red_sandstone
+    - minecraft:smooth_red_sandstone
+    - minecraft:deepslate
+    - minecraft:blackstone
+    - minecraft:netherrack
+  fragile:
+    attribute-modifier:
+      # The operation to use ('ADD_SCALAR', 'ADD_NUMBER' or 'MULTIPLY_SCALAR_1')
+      operation: ADD_NUMBER
+      # A mathematical expression used to modify the attribute, where 'x' is a variable representing the default modifier.
+      # Example: 'x * 3' will triple the value used in the modifier.
+      expression: x
+  fresh_air:
+    # Minimum altitude the player can sleep at
+    minimum_altitude: 86
+  vegetarian:
+    # Poison the player when consuming meat rather than preventing them from eating it
+    consume_and_poison: false
+    # Items that count as meat
+    meat:
+    - minecraft:porkchop
+    - minecraft:cooked_porkchop
+    - minecraft:beef
+    - minecraft:cooked_beef
+    - minecraft:chicken
+    - minecraft:cooked_chicken
+    - minecraft:rabbit
+    - minecraft:cooked_rabbit
+    - minecraft:mutton
+    - minecraft:cooked_mutton
+    - minecraft:rabbit_stew
+    - minecraft:cod
+    - minecraft:cooked_cod
+    - minecraft:tropical_fish
+    - minecraft:salmon
+    - minecraft:cooked_salmon
+    - minecraft:pufferfish
+    - minecraft:rotten_flesh
+    - minecraft:spider_eye
+  master_of_webs:
+    # The duration of the cooldown (in ticks)
+    cooldown-duration: 120
+  tailwind:
+    attribute-modifier:
+      # The operation to use ('ADD_SCALAR', 'ADD_NUMBER' or 'MULTIPLY_SCALAR_1')
+      operation: MULTIPLY_SCALAR_1
+      # A mathematical expression used to modify the attribute, where 'x' is a variable representing the default modifier.
+      # Example: 'x * 3' will triple the value used in the modifier.
+      expression: x
+  arthropod:
+    # Apply Slowness when using Bane of Arthropods on players with the Arthropod ability
+    apply_slowness: true
+  carnivore:
+    # Poison the player when consuming non-meat rather than preventing them from eating it
+    consume_and_poison: false
+    # Items that count as meat
+    meat:
+    - minecraft:porkchop
+    - minecraft:cooked_porkchop
+    - minecraft:beef
+    - minecraft:cooked_beef
+    - minecraft:chicken
+    - minecraft:cooked_chicken
+    - minecraft:rabbit
+    - minecraft:cooked_rabbit
+    - minecraft:mutton
+    - minecraft:cooked_mutton
+    - minecraft:rabbit_stew
+    - minecraft:cod
+    - minecraft:cooked_cod
+    - minecraft:tropical_fish
+    - minecraft:salmon
+    - minecraft:cooked_salmon
+    - minecraft:pufferfish
+  nine_lives:
+    attribute-modifier:
+      # The operation to use ('ADD_SCALAR', 'ADD_NUMBER' or 'MULTIPLY_SCALAR_1')
+      operation: ADD_NUMBER
+      # A mathematical expression used to modify the attribute, where 'x' is a variable representing the default modifier.
+      # Example: 'x * 3' will triple the value used in the modifier.
+      expression: x
+  burn_in_daylight:
+    # Whether the player should burn even when wearing a helmet
+    burn_with_helmet: true
+  water_vulnerability:
+    # Amount of damage to take in water
+    damage_amount: 1
+  phantomize:
+    # The food level at which you can no longer enter Phantom Form
+    minimum_food_level: 6
+    # Whether to disable Phantom Form when taking damage
+    disable_on_damage: false
+    trigger:
+      # The action (e.g. LEFT_CLICK, RIGHT_CLICK) that triggers this ability
+      # You can see a full list of actions at https://starshooter.gitbook.io/origins-reborn/configuration#triggerable-ability-configuration
+      type: LEFT_CLICK
+      # The conditions (e.g. EMPTY_HAND, NO_BLOCK) that are required to trigger this ability
+      # You can see a full list of conditions at https://starshooter.gitbook.io/origins-reborn/configuration#triggerable-ability-configuration
+      conditions:
+      - EMPTY_HAND
+      - NO_BLOCK
+  throw_ender_pearl:
+    trigger:
+      # The action (e.g. LEFT_CLICK, RIGHT_CLICK) that triggers this ability
+      # You can see a full list of actions at https://starshooter.gitbook.io/origins-reborn/configuration#triggerable-ability-configuration
+      type: LEFT_CLICK
+      # The conditions (e.g. EMPTY_HAND, NO_BLOCK) that are required to trigger this ability
+      # You can see a full list of conditions at https://starshooter.gitbook.io/origins-reborn/configuration#triggerable-ability-configuration
+      conditions:
+      - EMPTY_HAND
+      - NO_BLOCK
+    # The duration of the cooldown (in ticks)
+    cooldown-duration: 30
+  air_from_potions:
+    # Amount to increase air by when drinking a potion
+    air_increase: 60
+  light_armor:
+    # Armor allowed to be equipped
+    allowed_armor:
+    - minecraft:chainmail_helmet
+    - minecraft:chainmail_chestplate
+    - minecraft:chainmail_leggings
+    - minecraft:chainmail_boots
+    - minecraft:leather_helmet
+    - minecraft:leather_chestplate
+    - minecraft:leather_leggings
+    - minecraft:leather_boots
+    - minecraft:golden_helmet
+    - minecraft:golden_chestplate
+    - minecraft:golden_leggings
+    - minecraft:golden_boots
+  damage_from_potions:
+    # Amount of damage the player should take when drinking a potion
+    damage_amount: 2
+  damage_from_snowballs:
+    # Amount of damage the player should take when hit with a snowball
+    damage_amount: 3
+    # Whether snowballs should deal knockback too
+    knockback: true
+  burning_wrath:
+    # How much to increase damage dealt when on fire
+    damage_increase: 3
+  sprint_jump:
+    # Strength of the Jump Boost effect to give
+    jump_strength: 1
+  aerial_combatant:
+    # Amount to multiply the damage by when gliding
+    damage_multiplier: 2.0
+  elytra:
+    # Disable the ability to disengage the elytra by double tapping again
+    disable_disengage_trigger: true
+  launch_into_air:
+    # How strong the launch effect should be
+    launch_strength: 2.0
+    trigger:
+      # The action (e.g. LEFT_CLICK, RIGHT_CLICK) that triggers this ability
+      # You can see a full list of actions at https://starshooter.gitbook.io/origins-reborn/configuration#triggerable-ability-configuration
+      type: SNEAK_ON
+      # The conditions (e.g. EMPTY_HAND, NO_BLOCK) that are required to trigger this ability
+      # You can see a full list of conditions at https://starshooter.gitbook.io/origins-reborn/configuration#triggerable-ability-configuration
+      conditions:
+      - GLIDING
+    # The duration of the cooldown (in ticks)
+    cooldown-duration: 600
+  hunger_over_time:
+    # The amount to add to the player's exhaustion each second
+    metabolism_increase: 0.812
+  more_exhaustion:
+    # Amount to multiply exhaustion by
+    exhaustion_multiplier: 1.6
+  aquatic:
+    # Amount to increase damage by per level of Impaling
+    impaling_damage_increase: 2.5
+  flame_particles:
+    # How often (in ticks) the particles should appear
+    frequency: 4
+  ender_particles:
+    # How often (in ticks) the particles should appear
+    frequency: 4
+  phasing:
+    # Blocks you cannot pass through when phasing
+    impassable_blocks:
+    - minecraft:obsidian
+    - minecraft:crying_obsidian
+    - minecraft:bedrock
+    # Apply Blindness when Phasing
+    give_blindness: true
+    # Speed at which the player should move when phasing
+    phasing_speed: 0.1
+  strong_arms:
+    # Blocks that count as natural stone
+    natural_stones:
+    - minecraft:stone
+    - minecraft:tuff
+    - minecraft:granite
+    - minecraft:diorite
+    - minecraft:andesite
+    - minecraft:sandstone
+    - minecraft:smooth_sandstone
+    - minecraft:red_sandstone
+    - minecraft:smooth_red_sandstone
+    - minecraft:deepslate
+    - minecraft:blackstone
+    - minecraft:netherrack
+  shulker_inventory:
+    # Drop items in the inventory on death (will not change ability description, for that edit the translations.yml file)
+    drop_on_death: false
+    trigger:
+      # The action (e.g. LEFT_CLICK, RIGHT_CLICK) that triggers this ability
+      # You can see a full list of actions at https://starshooter.gitbook.io/origins-reborn/configuration#triggerable-ability-configuration
+      type: RIGHT_CLICK_CHESTPLATE
+      # The conditions (e.g. EMPTY_HAND, NO_BLOCK) that are required to trigger this ability
+      # You can see a full list of conditions at https://starshooter.gitbook.io/origins-reborn/configuration#triggerable-ability-configuration
+      conditions: []
+  natural_armor:
+    attribute-modifier:
+      # The operation to use ('ADD_SCALAR', 'ADD_NUMBER' or 'MULTIPLY_SCALAR_1')
+      operation: ADD_NUMBER
+      # A mathematical expression used to modify the attribute, where 'x' is a variable representing the default modifier.
+      # Example: 'x * 3' will triple the value used in the modifier.
+      expression: x
+  conduit_power_on_land:
+    # Whether to force compatibility with other abilities
+    # Less efficient, but prevents it breaking if a player has both this and an ability like origins:water_vulnerability
+    forced_compatibility: false
+  extra_reach_blocks:
+    attribute-modifier:
+      # The operation to use ('ADD_SCALAR', 'ADD_NUMBER' or 'MULTIPLY_SCALAR_1')
+      operation: ADD_NUMBER
+      # A mathematical expression used to modify the attribute, where 'x' is a variable representing the default modifier.
+      # Example: 'x * 3' will triple the value used in the modifier.
+      expression: x
+  extra_reach_entities:
+    attribute-modifier:
+      # The operation to use ('ADD_SCALAR', 'ADD_NUMBER' or 'MULTIPLY_SCALAR_1')
+      operation: ADD_NUMBER
+      # A mathematical expression used to modify the attribute, where 'x' is a variable representing the default modifier.
+      # Example: 'x * 3' will triple the value used in the modifier.
+      expression: x
+  daylight_sensitive:
+    # Whether the player should burn even when wearing a helmet
+    burn_with_helmet: true
+fantasyorigins:
+  bow_burst:
+    # The number of arrows to fire
+    arrow_count: 3
+    # The time in seconds to disable the bow for
+    cooldown_time: 7
+  chime:
+    # Time in ticks the regeneration effect should last
+    regeneration_time: 900
+  double_health:
+    attribute-modifier:
+      # The operation to use ('ADD_SCALAR', 'ADD_NUMBER' or 'MULTIPLY_SCALAR_1')
+      operation: ADD_NUMBER
+      # A mathematical expression used to modify the attribute, where 'x' is a variable representing the default modifier.
+      # Example: 'x * 3' will triple the value used in the modifier.
+      expression: x
+  dragon_fireball:
+    # The cooldown in seconds between each fireball
+    cooldown_time: 30
+    # The velocity the fireball should be given
+    fireball_velocity: 1.2
+    trigger:
+      # The action (e.g. LEFT_CLICK, RIGHT_CLICK) that triggers this ability
+      # You can see a full list of actions at https://starshooter.gitbook.io/origins-reborn/configuration#triggerable-ability-configuration
+      type: RIGHT_CLICK
+      # The conditions (e.g. EMPTY_HAND, NO_BLOCK) that are required to trigger this ability
+      # You can see a full list of conditions at https://starshooter.gitbook.io/origins-reborn/configuration#triggerable-ability-configuration
+      conditions:
+      - HOLDING_SWORD
+  elegy:
+    attribute-modifier:
+      # The operation to use ('ADD_SCALAR', 'ADD_NUMBER' or 'MULTIPLY_SCALAR_1')
+      operation: MULTIPLY_SCALAR_1
+      # A mathematical expression used to modify the attribute, where 'x' is a variable representing the default modifier.
+      # Example: 'x * 3' will triple the value used in the modifier.
+      expression: x
+  end_crystal_healing:
+    # Range the end crystal effect should be
+    crystal_range: 48
+  fortune_increaser:
+    # Level to increase Fortune by
+    fortune_increase: 2
+  increased_arrow_damage:
+    # Amount to add to arrow damage
+    arrow_damage_increase: 3.0
+  increased_arrow_speed:
+    # Multiplier for the arrow's velocity
+    arrow_speed_multiplier: 2.0
+  increased_cooldown:
+    attribute-modifier:
+      # The operation to use ('ADD_SCALAR', 'ADD_NUMBER' or 'MULTIPLY_SCALAR_1')
+      operation: MULTIPLY_SCALAR_1
+      # A mathematical expression used to modify the attribute, where 'x' is a variable representing the default modifier.
+      # Example: 'x * 3' will triple the value used in the modifier.
+      expression: x
+  increased_damage:
+    attribute-modifier:
+      # The operation to use ('ADD_SCALAR', 'ADD_NUMBER' or 'MULTIPLY_SCALAR_1')
+      operation: MULTIPLY_SCALAR_1
+      # A mathematical expression used to modify the attribute, where 'x' is a variable representing the default modifier.
+      # Example: 'x * 3' will triple the value used in the modifier.
+      expression: x
+  end_health:
+    attribute-modifier:
+      # The operation to use ('ADD_SCALAR', 'ADD_NUMBER' or 'MULTIPLY_SCALAR_1')
+      operation: ADD_NUMBER
+      # A mathematical expression used to modify the attribute, where 'x' is a variable representing the default modifier.
+      # Example: 'x * 3' will triple the value used in the modifier.
+      expression: x
+  end_strength:
+    attribute-modifier:
+      # The operation to use ('ADD_SCALAR', 'ADD_NUMBER' or 'MULTIPLY_SCALAR_1')
+      operation: MULTIPLY_SCALAR_1
+      # A mathematical expression used to modify the attribute, where 'x' is a variable representing the default modifier.
+      # Example: 'x * 3' will triple the value used in the modifier.
+      expression: x
+  infinite_haste:
+    # Level of the effect
+    effect_level: 1
+  land_weakness:
+    attribute-modifier:
+      # The operation to use ('ADD_SCALAR', 'ADD_NUMBER' or 'MULTIPLY_SCALAR_1')
+      operation: MULTIPLY_SCALAR_1
+      # A mathematical expression used to modify the attribute, where 'x' is a variable representing the default modifier.
+      # Example: 'x * 3' will triple the value used in the modifier.
+      expression: x
+  land_health:
+    attribute-modifier:
+      # The operation to use ('ADD_SCALAR', 'ADD_NUMBER' or 'MULTIPLY_SCALAR_1')
+      operation: ADD_NUMBER
+      # A mathematical expression used to modify the attribute, where 'x' is a variable representing the default modifier.
+      # Example: 'x * 3' will triple the value used in the modifier.
+      expression: x
+  land_slowness:
+    attribute-modifier:
+      # The operation to use ('ADD_SCALAR', 'ADD_NUMBER' or 'MULTIPLY_SCALAR_1')
+      operation: MULTIPLY_SCALAR_1
+      # A mathematical expression used to modify the attribute, where 'x' is a variable representing the default modifier.
+      # Example: 'x * 3' will triple the value used in the modifier.
+      expression: x
+  moon_strength:
+    attribute-modifier:
+      # The operation to use ('ADD_SCALAR', 'ADD_NUMBER' or 'MULTIPLY_SCALAR_1')
+      operation: MULTIPLY_SCALAR_1
+      # A mathematical expression used to modify the attribute, where 'x' is a variable representing the default modifier.
+      # Example: 'x * 3' will triple the value used in the modifier.
+      expression: x
+  natural_armor:
+    attribute-modifier:
+      # The operation to use ('ADD_SCALAR', 'ADD_NUMBER' or 'MULTIPLY_SCALAR_1')
+      operation: ADD_NUMBER
+      # A mathematical expression used to modify the attribute, where 'x' is a variable representing the default modifier.
+      # Example: 'x * 3' will triple the value used in the modifier.
+      expression: x
+  water_health:
+    attribute-modifier:
+      # The operation to use ('ADD_SCALAR', 'ADD_NUMBER' or 'MULTIPLY_SCALAR_1')
+      operation: ADD_NUMBER
+      # A mathematical expression used to modify the attribute, where 'x' is a variable representing the default modifier.
+      # Example: 'x * 3' will triple the value used in the modifier.
+      expression: x
+  water_strength:
+    attribute-modifier:
+      # The operation to use ('ADD_SCALAR', 'ADD_NUMBER' or 'MULTIPLY_SCALAR_1')
+      operation: MULTIPLY_SCALAR_1
+      # A mathematical expression used to modify the attribute, where 'x' is a variable representing the default modifier.
+      # Example: 'x * 3' will triple the value used in the modifier.
+      expression: x
+  vampiric_transformation:
+    # Chance (between 0 and 1) a player will transform into a vampire when killed by one
+    transformation_chance: 1.0
+  water_sensitive:
+    # Amount to damage the player by
+    damage_amount: 1
+  stronger:
+    attribute-modifier:
+      # The operation to use ('ADD_SCALAR', 'ADD_NUMBER' or 'MULTIPLY_SCALAR_1')
+      operation: MULTIPLY_SCALAR_1
+      # A mathematical expression used to modify the attribute, where 'x' is a variable representing the default modifier.
+      # Example: 'x * 3' will triple the value used in the modifier.
+      expression: x
+  solid_stance:
+    attribute-modifier:
+      # The operation to use ('ADD_SCALAR', 'ADD_NUMBER' or 'MULTIPLY_SCALAR_1')
+      operation: ADD_NUMBER
+      # A mathematical expression used to modify the attribute, where 'x' is a variable representing the default modifier.
+      # Example: 'x * 3' will triple the value used in the modifier.
+      expression: x
+  stiff:
+    attribute-modifier:
+      # The operation to use ('ADD_SCALAR', 'ADD_NUMBER' or 'MULTIPLY_SCALAR_1')
+      operation: MULTIPLY_SCALAR_1
+      # A mathematical expression used to modify the attribute, where 'x' is a variable representing the default modifier.
+      # Example: 'x * 3' will triple the value used in the modifier.
+      expression: x
+  large_body:
+    attribute-modifier:
+      # The operation to use ('ADD_SCALAR', 'ADD_NUMBER' or 'MULTIPLY_SCALAR_1')
+      operation: MULTIPLY_SCALAR_1
+      # A mathematical expression used to modify the attribute, where 'x' is a variable representing the default modifier.
+      # Example: 'x * 3' will triple the value used in the modifier.
+      expression: x
+  small_body:
+    attribute-modifier:
+      # The operation to use ('ADD_SCALAR', 'ADD_NUMBER' or 'MULTIPLY_SCALAR_1')
+      operation: MULTIPLY_SCALAR_1
+      # A mathematical expression used to modify the attribute, where 'x' is a variable representing the default modifier.
+      # Example: 'x * 3' will triple the value used in the modifier.
+      expression: x
