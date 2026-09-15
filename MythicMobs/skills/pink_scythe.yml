@@ -1,0 +1,195 @@
+# ============================================================
+# SAKURA SCYTHE - REVISI (v3: reverse-engineered dari SimpleSlash.yml)
+# Arsitektur sama seperti red_scythe.yml v3: hit-detection dipisah dari
+# visual. Visual = titik-titik matematis (lingkaran radius R, sudut theta),
+# roll sedikit bergantian tiap hit combo (15,-15,0 derajat) supaya terasa
+# seperti gerakan sabit natural berayun kiri-kanan-lurus, bukan 3x tebasan
+# identik.
+# ============================================================
+
+Sakura_Idle:
+  Skills:
+  - effect:particles{particle=cherry_leaves;amount=1;hS=0.2;vS=0.3;speed=0.02} @self
+
+Sakura_Point:
+  Skills:
+  - effect:particles{particle=cherry_leaves;amount=1;speed=0} @origin
+
+# --- SAKURA SLASH 1/2/3 ------------------------------------------------------
+Sakura_HitCheck_Light:
+  Skills:
+  - projectile{onHit=Sakura_Hit_Light;v=2;i=1;mr=2;hR=1.2;vR=1.2;hnp=true;g=0} @Forward{f=0.5;y=1.2}
+
+Sakura_HitCheck_Heavy:
+  Skills:
+  - projectile{onHit=Sakura_Hit_Heavy;v=2;i=1;mr=2.5;hR=1.4;vR=1.4;hnp=true;g=0} @Forward{f=0.5;y=1.2}
+
+Sakura_Hit_Light:
+  Skills:
+  - damage{amount=4} @target
+  - effect:particles{particle=cherry_leaves;amount=2;speed=0} @target
+
+Sakura_Hit_Heavy:
+  Skills:
+  - damage{amount=8} @target
+  - effect:particles{particle=cherry_leaves;amount=4;speed=0} @target
+
+Sakura_Slash_1:
+  Cooldown: 0.4
+  Conditions:
+  - hasaurastacks{auraName=Sakura_Combo;stacks=1} castinstead Sakura_Slash_2
+  Skills:
+  - Aura{auraName=Sakura_Combo;duration=30;maxStacks=3} @self
+  - sound{s=entity.player.attack.sweep;v=0.8;p=1.6} @self
+  - lunge{velocity=0.15;velocityY=0} @forward{f=1;lockpitch=true}
+  - skill{s=Sakura_HitCheck_Light} @self
+  - projectile{syo=0.903;sso=-1.108;sfo=1.097;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=0.928;sso=-1.013;sfo=0.973;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=0.957;sso=-0.906;sfo=0.861;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=0.989;sso=-0.787;sfo=0.761;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.024;sso=-0.658;sfo=0.677;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - delay 1
+  - projectile{syo=1.06;sso=-0.521;sfo=0.608;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.099;sso=-0.377;sfo=0.555;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.139;sso=-0.228;sfo=0.52;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.18;sso=-0.076;sfo=0.502;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.22;sso=0.076;sfo=0.502;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - delay 1
+  - projectile{syo=1.261;sso=0.228;sfo=0.52;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.301;sso=0.377;sfo=0.555;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.34;sso=0.521;sfo=0.608;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.376;sso=0.658;sfo=0.677;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.411;sso=0.787;sfo=0.761;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - delay 1
+  - projectile{syo=1.443;sso=0.906;sfo=0.861;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.472;sso=1.013;sfo=0.973;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.497;sso=1.108;sfo=1.097;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+
+Sakura_Slash_2:
+  Cooldown: 0.4
+  Conditions:
+  - hasaurastacks{auraName=Sakura_Combo;stacks=2} castinstead Sakura_Slash_3
+  Skills:
+  - Aura{auraName=Sakura_Combo;duration=30;maxStacks=3} @self
+  - sound{s=entity.player.attack.sweep;v=0.9;p=1.8} @self
+  - lunge{velocity=0.15;velocityY=0} @forward{f=1;lockpitch=true}
+  - skill{s=Sakura_HitCheck_Light} @self
+  - projectile{syo=1.559;sso=-1.338;sfo=1.3;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.53;sso=-1.233;sfo=1.136;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.497;sso=-1.11;sfo=0.986;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.46;sso=-0.969;sfo=0.853;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.418;sso=-0.814;sfo=0.74;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - delay 1
+  - projectile{syo=1.373;sso=-0.646;sfo=0.646;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.326;sso=-0.469;sfo=0.575;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.276;sso=-0.284;sfo=0.527;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.225;sso=-0.095;sfo=0.503;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.175;sso=0.095;sfo=0.503;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - delay 1
+  - projectile{syo=1.124;sso=0.284;sfo=0.527;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.074;sso=0.469;sfo=0.575;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.027;sso=0.646;sfo=0.646;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=0.982;sso=0.814;sfo=0.74;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=0.94;sso=0.969;sfo=0.853;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - delay 1
+  - projectile{syo=0.903;sso=1.11;sfo=0.986;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=0.87;sso=1.233;sfo=1.136;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=0.841;sso=1.338;sfo=1.3;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+
+Sakura_Slash_3:
+  Cooldown: 1.5
+  Skills:
+  - auraremove{aura=Sakura_Combo} @self
+  - sound{s=entity.player.attack.crit;v=1;p=1.5} @self
+  - lunge{velocity=0.2;velocityY=0} @forward{f=1;lockpitch=true}
+  - skill{s=Sakura_HitCheck_Heavy} @self
+  - projectile{syo=1.2;sso=-1.97;sfo=2.153;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.2;sso=-1.886;sfo=1.835;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.2;sso=-1.752;sfo=1.536;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.2;sso=-1.571;sfo=1.262;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.2;sso=-1.347;sfo=1.022;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - delay 1
+  - projectile{syo=1.2;sso=-1.088;sfo=0.822;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.2;sso=-0.798;sfo=0.666;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.2;sso=-0.488;sfo=0.56;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.2;sso=-0.164;sfo=0.507;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.2;sso=0.164;sfo=0.507;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - delay 1
+  - projectile{syo=1.2;sso=0.488;sfo=0.56;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.2;sso=0.798;sfo=0.666;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.2;sso=1.088;sfo=0.822;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.2;sso=1.347;sfo=1.022;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.2;sso=1.571;sfo=1.262;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - delay 1
+  - projectile{syo=1.2;sso=1.752;sfo=1.536;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.2;sso=1.886;sfo=1.835;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+  - projectile{syo=1.2;sso=1.97;sfo=2.153;i=1;d=2;sE=false;mr=1;v=0;vR=1;hR=1;ot=Sakura_Point} @SelfLocation
+
+# --- SAKURA STEP --------------------------------------------------------
+Sakura_Step:
+  Cooldown: 1.2
+  Skills:
+  - sound{s=entity.player.attack.sweep;v=0.6;p=1.6} @self
+  - onDamaged{auraName=Sakura_LandResist;cancelEvent=true;d=20;damageMods="FALL 0"} @self
+  - lunge{velocity=1.3;velocityY=0.15} @forward{f=14;lockpitch=true}
+  - effect:particles{particle=cherry_leaves;amount=10;hS=0.2;vS=0.2;speed=0.1} @Forward{f=7;y=1}
+  - potion{type=SPEED;duration=30;level=1} @self
+
+# --- SAKURA FLICKER -------------------------------------------------------
+Sakura_Flicker:
+  Conditions:
+  - hasaurastacks{auraName=Sakura_Combo;stacks=3} true
+  Cooldown: 3
+  Skills:
+  - auraremove{aura=Sakura_Combo} @self
+  - sound{s=entity.enderman.teleport;v=0.7;p=1.4} @self
+  - effect:particles{particle=cherry_leaves;amount=20;hS=0.4;vS=0.4;speed=0.1} @self
+  - teleport{} @forward{f=6;y=0.2}
+  - effect:particles{particle=cherry_leaves;amount=20;hS=0.4;vS=0.4;speed=0.1} @self
+  - damage{amount=4} @PlayersInRadius{radius=2}
+
+# --- SAKURA BLOOM ----------------------------------------------------------
+Sakura_Bloom:
+  Cooldown: 10
+  Skills:
+  - sound{s=entity.player.levelup;v=0.5;p=1.5} @self
+  - effect:particles{particle=cherry_leaves;amount=25;hS=0.6;vS=0.8;speed=0.05;y=1} @self
+  - potion{type=SPEED;duration=100;level=2} @self
+  - potion{type=JUMP;duration=100;level=1} @self
+
+# --- SAKURA WALTZ ----------------------------------------------------------
+Sakura_Waltz:
+  Cooldown: 18
+  Skills:
+  - sound{s=entity.player.attack.sweep;v=1;p=1.8} @self
+  - skill{s=Sakura_Step} @self
+  - delay 6
+  - skill{s=Sakura_Slash_1} @self
+  - delay 6
+  - skill{s=Sakura_Slash_2} @self
+  - delay 6
+  - skill{s=Sakura_Slash_3} @self
+  - delay 4
+  - sound{s=entity.enderman.teleport;v=0.7;p=1.4} @self
+  - effect:particles{particle=cherry_leaves;amount=20;hS=0.4;vS=0.4;speed=0.1} @self
+  - teleport{} @forward{f=6;y=0.2}
+  - effect:particles{particle=cherry_leaves;amount=20;hS=0.4;vS=0.4;speed=0.1} @self
+  - damage{amount=4} @PlayersInRadius{radius=2}
+
+# ============================================================
+# ROUTER
+# ============================================================
+# Klik kanan               -> combo Sakura_Slash 1/2/3
+# Sneak + klik kanan       -> Sakura_Step (dash)
+# Sneak + Jump + klik kanan -> Sakura_Waltz (ultimate)
+Sakura_RightClick_Router:
+  Conditions:
+  - crouching true castinstead Sakura_RightClick_CrouchCheck
+  Skills:
+  - skill{s=Sakura_Slash_1} @self
+
+Sakura_RightClick_CrouchCheck:
+  Conditions:
+  - jumping true castinstead Sakura_Waltz
+  Skills:
+  - skill{s=Sakura_Step} @self

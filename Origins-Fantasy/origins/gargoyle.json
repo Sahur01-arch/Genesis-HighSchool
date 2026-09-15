@@ -1,0 +1,17 @@
+{
+  "powers": [
+    "fantasyorigins:stone_skin",
+    "fantasyorigins:solid_stance",
+    "fantasyorigins:stiff",
+    "fantasyorigins:fire_resistant",
+    "fantasyorigins:potion_resistant",
+    "fantasyorigins:heavy_blow",
+    "origins:natural_armor"
+  ],
+  "icon": {
+    "item": "minecraft:stone"
+  },
+  "order": 1,
+  "impact": 2,
+  "description": "Stone statues awoken by magic, Gargoyles move slowly but are very strong."
+}

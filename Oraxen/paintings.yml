@@ -1,0 +1,14 @@
+# Defines custom painting variants injected through NMS on Paper 1.21.5+.
+# Texture assets are resolved as assets/<namespace>/textures/painting/<path>.png.
+# Title and author support MiniMessage formatting.
+#
+# paintings:
+#   oraxen:edna:
+#     author: the_jan_craft
+#     title: <red>Custom Painting
+#     asset_id: oraxen:edna
+#     width: 1
+#     height: 1
+#     include_in_random: false
+
+paintings: {}

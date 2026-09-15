@@ -1,0 +1,43 @@
+crimson_slash_item:
+  itemname: <red>Crimson Scythe
+  material: NETHERITE_HOE
+  Pack:
+    model: rpgpack/crimson_scythe # ganti sesuai path model kamu sendiri
+  Mechanics:
+    durability:
+      value: 1500
+    custom:
+      crimson_attack:
+        one_usage: false
+        event: CLICK:right:all
+        actions:
+        - '[player] mm test cast Crimson_Slash'
+      
+      crimson_saikyou:
+        one_usage: false
+        event: CLICK:left:all # kombinasi klik kiri = ultimate
+        conditions:
+        - IS_SNEAKING
+        actions:
+        - '[player] mm test cast Crimson_SaikyouForm'
+
+sakura_scythe_item:
+  itemname: <#ffb7c5>Sakura Scythe
+  material: NETHERITE_HOE
+  Pack:
+    model: rpgpack/sakura_scythe
+  Mechanics:
+    durability:
+      value: 1500
+    custom:
+      sakura_attack:
+        one_usage: false
+        event: CLICK:right:all
+        actions:
+        - '[player] mm test cast Sakura_Slash_1'
+      
+      sakura_dash:
+        one_usage: false
+        event: CLICK:left:all
+        actions:
+        - '[player] mm test cast Sakura_Step'
